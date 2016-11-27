@@ -2,6 +2,7 @@ import {
   GraphQLBoolean,
   GraphQLEnumType,
   GraphQLFloat,
+  GraphQLInputObjectType,
   GraphQLInt,
   GraphQLList,
   GraphQLNonNull,
@@ -14,7 +15,7 @@ import Resolver from './resolver';
 
 const httpMethodEnum = new GraphQLEnumType({
   name: 'HttpMethod',
-  description: 'HTTP request methods',
+  description: 'HTTP request methods.',
   values: {
     GET: {
       value: 1,
@@ -83,7 +84,7 @@ const assertionType = new GraphQLObjectType({
 });
 const headerType = new GraphQLObjectType({
   name: 'Header',
-  description: 'An HTTP header',
+  description: 'An HTTP header.',
   fields: () => ({
     key: {
       type: GraphQLString,
@@ -141,7 +142,7 @@ const resultType = new GraphQLObjectType({
     },
     success: {
       type: GraphQLBoolean,
-      description: 'Whether or not the run succeeded.',
+      description: 'Whether or not the assertion succeeded.',
     },
   }),
 });
@@ -171,7 +172,101 @@ const runType = new GraphQLObjectType({
     },
     success: {
       type: GraphQLBoolean,
-      description: 'Whether or not the test run succeeded.',
+      description: 'Whether or not all assertions succeeded.',
+    },
+  }),
+});
+const headerInputType = new GraphQLInputObjectType({
+  name: 'HeaderInput',
+  description: 'An HTTP header input.',
+  fields: () => ({
+    key: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The header key.',
+    },
+    value: {
+      type: new GraphQLNonNull(GraphQLString),
+      description: 'The header value.',
+    },
+  }),
+});
+const requestInputType = new GraphQLInputObjectType({
+  name: 'RequestInput',
+  description: 'An HTTP request input.',
+  fields: () => ({
+    method: {
+      type: new GraphQLNonNull(httpMethodEnum),
+      description: 'The HTTP method.',
+    },
+    url: {
+      type: new GraphQLNonNull(GraphQLURL),
+      description: 'The URL of the request.',
+    },
+    headers: {
+      type: new GraphQLList(headerInputType),
+      description: 'A list of headers for the request.',
+    },
+    body: {
+      type: GraphQLString,
+      description: 'The body of the request.',
+    },
+  }),
+});
+const assertionInputType = new GraphQLInputObjectType({
+  name: 'AssertionInput',
+  description: 'An assertion input to run against the HTTP response.',
+  fields: () => ({
+    target: {
+      type: new GraphQLNonNull(assertionTargetEnum),
+      description: 'The HTTP response property to run the assertion against.',
+    },
+    comparison: {
+      type: new GraphQLNonNull(comparisonEnum),
+      description: 'The comparison used for the assertion.',
+    },
+    value: {
+      type: GraphQLString,
+      description: 'The expected value.',
+    },
+  }),
+});
+const testInputType = new GraphQLInputObjectType({
+  name: 'TestInput',
+  description: 'A test input.',
+  fields: () => ({
+    name: {
+      type: GraphQLString,
+      description: 'The name of the test.',
+    },
+    request: {
+      type: new GraphQLNonNull(requestInputType),
+      description: 'The HTTP request.',
+    },
+    assertions: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(assertionInputType))),
+      description: 'A list of assertions to run on the response.',
+    },
+  }),
+});
+const testUpdateInputType = new GraphQLInputObjectType({
+  name: 'TestUpdateInput',
+  description: 'A test update input that replaces the test with the specified id.',
+  fields: () => ({
+    id: {
+      type: new GraphQLNonNull(GraphQLUUID),
+      description: 'The id of the test.',
+    },
+    name: {
+      type: GraphQLString,
+      description: 'The name of the test.',
+    },
+    request: {
+      type: new GraphQLNonNull(requestInputType),
+      description: 'The HTTP request.',
+    },
+    assertions: {
+      type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(assertionInputType))),
+      description: 'A list of assertions to run on the response.',
     },
   }),
 });
@@ -247,6 +342,55 @@ export default class Schema extends GraphQLSchema {
               },
             },
             resolve: (root, { testId }) => resolver.getRuns(testId),
+          },
+        }),
+      }),
+      mutation: new GraphQLObjectType({
+        name: 'Mutation',
+        fields: () => ({
+          createTest: {
+            type: testType,
+            args: {
+              test: {
+                description: 'The test to create.',
+                type: new GraphQLNonNull(testInputType),
+              },
+            },
+            resolve: (root, { test }) => resolver.createTest(test),
+          },
+          updateTest: {
+            type: testType,
+            args: {
+              test: {
+                description: 'The test to replace.',
+                type: new GraphQLNonNull(testUpdateInputType),
+              },
+            },
+            resolve: (root, { test }) => resolver.updateTest(test),
+          },
+          deleteTest: {
+            type: testType,
+            args: {
+              id: {
+                description: 'The id of the test to delete.',
+                type: new GraphQLNonNull(GraphQLUUID),
+              },
+            },
+            resolve: (root, { id }) => resolver.deleteTest(id),
+          },
+          deleteRun: {
+            type: runType,
+            args: {
+              testId: {
+                description: 'The id of the test.',
+                type: new GraphQLNonNull(GraphQLUUID),
+              },
+              id: {
+                description: 'The id of the run to delete.',
+                type: new GraphQLNonNull(GraphQLUUID),
+              },
+            },
+            resolve: (root, { testId, id }) => resolver.deleteRun(testId, id),
           },
         }),
       }),
