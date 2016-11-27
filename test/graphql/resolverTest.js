@@ -1,18 +1,19 @@
-// import chai from 'chai';
-// import chaiAsPromised from 'chai-as-promised';
-// import { describe, it } from 'mocha';
-// import sinon from 'sinon';
-// import Resolver from '../../src/graphql/resolver';
-// import Reader from '../../src/storage/reader';
-// import Writer from '../../src/storage/writer';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { describe, it } from 'mocha';
+import sinon from 'sinon';
+import Resolver from '../../src/graphql/resolver';
+import Reader from '../../src/storage/reader';
+import Writer from '../../src/storage/writer';
 
-// chai.use(chaiAsPromised);
-// const expect = chai.expect;
-// const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
-// const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
+chai.use(chaiAsPromised);
+const expect = chai.expect;
+const runId = '11e6af50-8fbf-b952-80db-218d3d616683';
+const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
+const readerStub = sinon.stub(new Reader());
+const writerStub = sinon.stub(new Writer());
+const resolver = new Resolver(readerStub, writerStub);
 // const existingStep = {
-//   orderNum: 1,
-//   enabled: true,
 //   request: {
 //     method: 'POST',
 //     url: 'https://example.com/post',
@@ -24,8 +25,6 @@
 // };
 // const newStep = {
 //   testId,
-//   orderNum: 1,
-//   enabled: false,
 //   request: {
 //     headers: [{
 //       key: 'x-key1',
@@ -45,17 +44,34 @@
 //     value: '1000',
 //   }],
 // };
-// const readerStub = sinon.stub(new Reader());
-// const writerStub = sinon.stub(new Writer());
 
 // function setupGetTest(ret) {
-//   readerStub.getTest.withArgs(accountId, testId)
-//     .returns(new Promise(resolve => resolve(ret)));
+//   readerStub.getTest.withArgs(testId).returns(Promise.resolve(ret));
 // }
+
+describe('getRun', () => {
+  it('returns run', () => {
+    readerStub.getRun.withArgs(testId, runId).returns(Promise.resolve([{
+      id: runId,
+      started: 1480224613,
+      results: [{ success: true }, { success: true }],
+    }]));
+
+    return resolver.getRun(testId, runId).then(res => (
+      expect(res).to.deep.equal({
+        id: runId,
+        started: '2016-11-27T05:30:13.000Z',
+        results: [{ success: true }, { success: true }],
+        success: true,
+      }) && expect(readerStub.getRun.called).to.be.true
+    ));
+  });
+});
+
 
 // describe('updateTest', () => {
 //   function expectNotFound() {
-//     return new Resolver(readerStub, writerStub).updateTest(accountId, {
+//     return new Resolver(readerStub, writerStub).updateTest({
 //       id: testId,
 //     }).catch(err => expect(err).to.deep.equal(new ApiError('Test not found.', 404)));
 //   }
@@ -73,17 +89,13 @@
 //     setupGetTest({
 //       id: testId,
 //       name: 'Kittens',
-//       steps: [{
-//         orderNum: 1,
-//       }],
+//       steps: [{}],
 //     });
 
-//     return new Resolver(readerStub, writerStub).updateTest(accountId, {
+//     return new Resolver(readerStub, writerStub).updateTest({
 //       id: testId,
 //       name: 'Kittens',
-//       steps: [{
-//         orderNum: 3,
-//       }],
+//       steps: [{}],
 //     }).then(() => expect(writerStub.updateTest.called).to.be.false);
 //   });
 
@@ -92,121 +104,17 @@
 //     setupGetTest({
 //       id: testId,
 //       name: 'Kittens',
-//       enabled: true,
-//       steps: [{
-//         orderNum: 1,
-//       }],
+//       steps: [{}],
 //     });
 
-//     return new Resolver(readerStub, writerStub).updateTest(accountId, {
+//     return new Resolver(readerStub, writerStub).updateTest({
 //       id: testId,
 //       name: 'Puppies',
-//       steps: [{
-//         orderNum: 3,
-//       }],
-//     }).then(() => expect(writerStub.updateTest.calledWith(accountId, {
+//       steps: [{}],
+//     }).then(() => expect(writerStub.updateTest.calledWith({
 //       id: testId,
 //       name: 'Puppies',
-//       enabled: true,
-//       steps: [{
-//         orderNum: 1,
-//       }],
+//       steps: [{}],
 //     })).to.be.true);
-//   });
-// });
-
-// describe('updateStep', () => {
-//   function expectNotFound(errMsg = 'Test not found.') {
-//     return new Resolver(readerStub, writerStub).updateStep(accountId, {
-//       testId,
-//       orderNum: 2,
-//     }).catch(err => expect(err).to.deep.equal(new ApiError(errMsg, 404)));
-//   }
-
-//   it('returns error if no matching test found', () => {
-//     setupGetTest({
-//       id: undefined,
-//     });
-
-//     return expectNotFound();
-//   });
-
-//   it('returns error if no steps found', () => {
-//     setupGetTest({
-//       id: testId,
-//       steps: [],
-//     });
-
-//     return expectNotFound('Step not found.');
-//   });
-
-//   it('returns error if no matching step found', () => {
-//     setupGetTest({
-//       id: testId,
-//       steps: [{
-//         orderNum: 1,
-//       }],
-//     });
-
-//     return expectNotFound('Step not found.');
-//   });
-
-//   it('does not update if no changes', () => {
-//     writerStub.updateTest.reset();
-//     setupGetTest({
-//       id: testId,
-//       name: 'Kittens',
-//       steps: [{
-//         orderNum: 1,
-//         enabled: true,
-//       }],
-//     });
-
-//     return new Resolver(readerStub, writerStub).updateStep(accountId, {
-//       testId,
-//       orderNum: 1,
-//       enabled: true,
-//     }).then(() => expect(writerStub.updateTest.called).to.be.false);
-//   });
-
-//   it('updates props', () => {
-//     writerStub.updateTest.reset();
-//     setupGetTest({
-//       id: testId,
-//       steps: [existingStep, {
-//         orderNum: 2,
-//         enabled: true,
-//       }],
-//     });
-
-//     return new Resolver(readerStub, writerStub).updateStep(accountId, newStep)
-//       .then(() => expect(writerStub.updateTest.calledWith(accountId, {
-//         id: testId,
-//         steps: [{
-//           orderNum: 1,
-//           enabled: false,
-//           request: {
-//             headers: [{
-//               key: 'x-key1',
-//               value: 'x-value1',
-//             }, {
-//               key: 'x-key2',
-//               value: 'x-value2',
-//             }],
-//             method: 'GET',
-//             url: 'https://example.com/get',
-//           },
-//           assertions: [{
-//             type: 'STATUS_CODE_EQ',
-//             value: '200',
-//           }, {
-//             type: 'ELAPSED_LT',
-//             value: '1000',
-//           }],
-//         }, {
-//           orderNum: 2,
-//           enabled: true,
-//         }],
-//       })).to.be.true);
 //   });
 // });

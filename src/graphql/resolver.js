@@ -12,7 +12,7 @@ export default class Resolver {
 
   getRun(testId, runId) {
     return this.reader.getRun(testId, runId)
-      .then(run => (run.length ? Resolver._mapRun(run) : new Error('Step not found.')));
+      .then(run => (run.length ? Resolver._mapRun(run[0]) : new Error('Run not found.')));
   }
 
   getRuns(testId) {
@@ -54,7 +54,7 @@ export default class Resolver {
 
   static _mapRun(run) {
     const runCopy = run;
-    runCopy.started = new Date(Number(runCopy.started)).toISOString();
+    runCopy.started = new Date(Number(runCopy.started) * 1000).toISOString();
     runCopy.success = runCopy.results.every(result => result.success);
     return runCopy;
   }
