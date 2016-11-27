@@ -1,0 +1,143 @@
+# An assertion to run against the HTTP response.
+type Assertion {
+  # The HTTP response property to run the assertion against.
+  target: AssertionTarget
+
+  # The comparison used for the assertion.
+  comparison: Comparison
+
+  # The expected value.
+  value: String
+}
+
+# The HTTP response property to run assertions against.
+enum AssertionTarget {
+  STATUS_CODE
+  ELAPSED_TIME
+}
+
+# Comparisons.
+enum Comparison {
+  EQUAL
+  NOT_EQUAL
+  LESS_THAN
+}
+
+# The DateTime scalar type represents date time strings complying to ISO-8601.
+scalar DateTime
+
+# An HTTP header
+type Header {
+  # The header key.
+  key: String
+
+  # The header value.
+  value: String
+}
+
+# HTTP request methods
+enum HttpMethod {
+  GET
+  POST
+  PUT
+  DELETE
+  HEAD
+  OPTIONS
+}
+
+type Query {
+  test(
+    # The id of the test.
+    id: UUID!
+  ): Test
+  tests: [Test]!
+  run(
+    # The id of the test.
+    testId: UUID!
+
+    # The id of the run.
+    id: UUID!
+  ): Run
+  runs(
+    # The id of the test.
+    testId: UUID!
+  ): [Run]!
+}
+
+# An HTTP request.
+type Request {
+  # The HTTP method.
+  method: HttpMethod
+
+  # The URL of the request.
+  url: URL
+
+  # A list of headers for the request.
+  headers: [Header]
+
+  # The body of the request.
+  body: String
+}
+
+# An HTTP response.
+type Response {
+  # The status code returned.
+  statusCode: Int
+}
+
+# An assertion result.
+type Result {
+  # The expected assertion result.
+  expected: Assertion
+
+  # The actual value.
+  actual: String
+
+  # Whether or not the run succeeded.
+  success: Boolean
+}
+
+# A test run.
+type Run {
+  # The id of the run.
+  id: UUID!
+
+  # The time the test run started.
+  started: DateTime
+
+  # A list of headers for the request.
+  elapsedMs: Float
+
+  # The HTTP response returned.
+  response: Response
+
+  # A list of assertion results.
+  results: [Result]!
+
+  # Whether or not the test run succeeded.
+  success: Boolean
+}
+
+# A test.
+type Test {
+  # The id of the test.
+  id: UUID!
+
+  # The name of the test.
+  name: String
+
+  # The HTTP request.
+  request: Request
+
+  # A list of assertions to run on the response.
+  assertions: [Assertion]!
+
+  # A list of past runs.
+  runs: [Run]!
+}
+
+# The URL scalar type represents URL addresses.
+scalar URL
+
+# The UUID scalar type represents a UUID.
+scalar UUID
