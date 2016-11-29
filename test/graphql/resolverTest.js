@@ -14,41 +14,9 @@ const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const resolver = new Resolver(readerStub, writerStub);
 const expectedRun = { started: '1970-01-01T00:00:00.000Z', results: [], success: true };
-// const existingStep = {
-//   request: {
-//     method: 'POST',
-//     url: 'https://example.com/post',
-//   },
-//   assertions: [{
-//     type: 'STATUS_CODE_EQ',
-//     value: '201',
-//   }],
-// };
-// const newStep = {
-//   testId,
-//   request: {
-//     headers: [{
-//       key: 'x-key1',
-//       value: 'x-value1',
-//     }, {
-//       key: 'x-key2',
-//       value: 'x-value2',
-//     }],
-//     method: 'GET',
-//     url: 'https://example.com/get',
-//   },
-//   assertions: [{
-//     type: 'STATUS_CODE_EQ',
-//     value: '200',
-//   }, {
-//     type: 'ELAPSED_LT',
-//     value: '1000',
-//   }],
-// };
-
-// function setupGetTest(ret) {
-//   readerStub.getTest.withArgs(testId).returns(Promise.resolve(ret));
-// }
+const expectedTest = { id: testId };
+const runNotFound = 'Run not found.';
+const testNotFound = 'Test not found.';
 
 describe('getRun', () => {
   beforeEach(() => readerStub.getRun.reset());
@@ -58,7 +26,7 @@ describe('getRun', () => {
       .returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.getRun(testId, runId).then(res => (
-      expect(res).to.deep.equal([expectedRun]) && expect(readerStub.getRun.called).to.be.true
+      expect(res).to.deep.equal([expectedRun])
     ));
   });
 
@@ -66,8 +34,7 @@ describe('getRun', () => {
     readerStub.getRun.withArgs(testId, runId).returns(Promise.resolve([]));
 
     return resolver.getRun(testId, runId).then(res => (
-      expect(res).to.deep.equal(new Error('Run not found.')) &&
-      expect(readerStub.getRun.called).to.be.true
+      expect(res.message).to.equal(runNotFound)
     ));
   });
 });
@@ -79,7 +46,7 @@ describe('getRuns', () => {
     readerStub.getRuns.withArgs(testId).returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.getRuns(testId).then(res => (
-      expect(res).to.deep.equal([expectedRun]) && expect(readerStub.getRuns.called).to.be.true
+      expect(res).to.deep.equal([expectedRun])
     ));
   });
 
@@ -87,7 +54,7 @@ describe('getRuns', () => {
     readerStub.getRuns.withArgs(testId).returns(Promise.resolve([]));
 
     return resolver.getRuns(testId).then(res => (
-      expect(res).to.deep.equal([]) && expect(readerStub.getRuns.called).to.be.true
+      expect(res).to.deep.equal([])
     ));
   });
 });
@@ -99,8 +66,7 @@ describe('deleteRun', () => {
     writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.deleteRun(runId).then(res => (
-      expect(res).to.deep.equal([expectedRun]) &&
-      expect(writerStub.deleteRun.called).to.be.true
+      expect(res).to.deep.equal([expectedRun])
     ));
   });
 
@@ -108,58 +74,101 @@ describe('deleteRun', () => {
     writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([]));
 
     return resolver.deleteRun(runId).then(res => (
-      expect(res).to.deep.equal(new Error('Run not found.')) &&
-      expect(writerStub.deleteRun.called).to.be.true
+      expect(res.message).to.equal(runNotFound)
     ));
   });
 });
 
-// describe('updateTest', () => {
-//   function expectNotFound() {
-//     return new Resolver(readerStub, writerStub).updateTest({
-//       id: testId,
-//     }).catch(err => expect(err).to.deep.equal(new ApiError('Test not found.', 404)));
-//   }
+describe('createTest', () => {
+  beforeEach(() => writerStub.createTest.reset());
 
-//   it('returns error if no matching test found', () => {
-//     setupGetTest({
-//       id: undefined,
-//     });
+  it('returns created test', () => {
+    writerStub.createTest.withArgs(expectedTest).returns(Promise.resolve([expectedTest]));
 
-//     return expectNotFound();
-//   });
+    return resolver.createTest({ id: testId }).then(res => (
+      expect(res).to.deep.equal([expectedTest])
+    ));
+  });
+});
 
-//   it('does not update if no changes to non-arrays', () => {
-//     writerStub.updateTest.reset();
-//     setupGetTest({
-//       id: testId,
-//       name: 'Kittens',
-//       steps: [{}],
-//     });
+describe('getTest', () => {
+  beforeEach(() => readerStub.getTest.reset());
 
-//     return new Resolver(readerStub, writerStub).updateTest({
-//       id: testId,
-//       name: 'Kittens',
-//       steps: [{}],
-//     }).then(() => expect(writerStub.updateTest.called).to.be.false);
-//   });
+  it('returns test', () => {
+    readerStub.getTest.withArgs(testId).returns(Promise.resolve([{ id: testId }]));
 
-//   it('updates non-array props', () => {
-//     writerStub.updateTest.reset();
-//     setupGetTest({
-//       id: testId,
-//       name: 'Kittens',
-//       steps: [{}],
-//     });
+    return resolver.getTest(testId).then(res => (
+      expect(res).to.deep.equal([expectedTest])
+    ));
+  });
 
-//     return new Resolver(readerStub, writerStub).updateTest({
-//       id: testId,
-//       name: 'Puppies',
-//       steps: [{}],
-//     }).then(() => expect(writerStub.updateTest.calledWith({
-//       id: testId,
-//       name: 'Puppies',
-//       steps: [{}],
-//     })).to.be.true);
-//   });
-// });
+  it('returns error if no test returned', () => {
+    readerStub.getTest.withArgs(testId).returns(Promise.resolve([]));
+
+    return resolver.getTest(testId).then(res => (
+      expect(res.message).to.equal(testNotFound)
+    ));
+  });
+});
+
+describe('getTests', () => {
+  beforeEach(() => readerStub.getTests.reset());
+
+  it('returns tests', () => {
+    readerStub.getTests.returns(Promise.resolve([{ id: testId }]));
+
+    return resolver.getTests().then(res => (
+      expect(res).to.deep.equal([expectedTest])
+    ));
+  });
+
+  it('returns [] if no tests returned', () => {
+    readerStub.getTests.returns(Promise.resolve([]));
+
+    return resolver.getTests().then(res => (
+      expect(res).to.deep.equal([])
+    ));
+  });
+});
+
+describe('updateTest', () => {
+  beforeEach(() => writerStub.updateTest.reset());
+
+  it('returns updated test', () => {
+    const test = { id: testId };
+    readerStub.getTest.withArgs(test.id).returns(Promise.resolve([test]));
+    writerStub.updateTest.returns(Promise.resolve([expectedTest]));
+
+    return resolver.updateTest(test).then(res => (
+      expect(res).to.deep.equal([expectedTest])
+    ));
+  });
+
+  it('returns error if no test returned', () => {
+    readerStub.getTest.withArgs(testId).returns(Promise.resolve([]));
+
+    return resolver.updateTest({ id: testId }).then(res => (
+      expect(res.message).to.equal(testNotFound)
+    ));
+  });
+});
+
+describe('deleteTest', () => {
+  beforeEach(() => writerStub.deleteTest.reset());
+
+  it('returns deleted test', () => {
+    writerStub.deleteTest.withArgs(testId).returns(Promise.resolve([{ id: testId }]));
+
+    return resolver.deleteTest(testId).then(res => (
+      expect(res).to.deep.equal([expectedTest])
+    ));
+  });
+
+  it('returns error if no test returned', () => {
+    writerStub.deleteTest.withArgs(testId).returns(Promise.resolve([]));
+
+    return resolver.deleteTest(testId).then(res => (
+      expect(res.message).to.equal(testNotFound)
+    ));
+  });
+});

@@ -37,7 +37,6 @@ export default class Resolver {
   }
 
   deleteTest(testId) {
-    this.getRuns(testId).then(runs => runs.map(run => this.deleteRun(run.id)));
-    return this.reader.deleteTest(testId);
+    return this.writer.deleteTest(testId).then(Mapper.toApiTest);
   }
 }
