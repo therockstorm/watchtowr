@@ -25,8 +25,8 @@ class Response {
   }
 }
 
-export function handle( // eslint-disable-line import/prefer-default-export
-  event, context, cb, schema = new Schema()) {
+// eslint-disable-next-line import/prefer-default-export
+export function handle(event, context, cb, schema = new Schema()) {
   let body;
   try {
     body = JSON.parse(event.body);

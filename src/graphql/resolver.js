@@ -1,8 +1,6 @@
-import equal from 'deep-equal';
+import Mapper from './mapper';
 import Reader from '../storage/reader';
 import Writer from '../storage/writer';
-
-const testNotFound = new Error('Test not found.');
 
 export default class Resolver {
   constructor(reader = new Reader(), writer = new Writer()) {
@@ -11,17 +9,18 @@ export default class Resolver {
   }
 
   getRun(testId, runId) {
-    return this.reader.getRun(testId, runId)
-      .then(run => (run.length ? Resolver._mapRun(run[0]) : new Error('Run not found.')));
+    return this.reader.getRun(testId, runId).then(run => Mapper.toApiRun(run));
   }
 
   getRuns(testId) {
-    return testId ? this.reader.getRuns(testId)
-      .then(runs => runs.map(run => Resolver._mapRun(run))) : [];
+    return this.reader.getRuns(testId).then((runs) => {
+      const mapped = Mapper.toApiRun(runs);
+      return mapped instanceof Error ? [] : mapped;
+    });
   }
 
   deleteRun(testId, runId) {
-    return this.reader.deleteRun(testId, runId);
+    return this.writer.deleteRun(testId, runId).then(run => Mapper.toApiRun(run));
   }
 
   createTest(test) {
@@ -29,33 +28,22 @@ export default class Resolver {
   }
 
   getTest(testId) {
-    return this.reader.getTest(testId).then(test => (test.length ? test : testNotFound));
+    return this.reader.getTest(testId).then(test => Mapper.toApiRun(test));
   }
 
   getTests() {
-    return this.reader.getTests();
+    return this.reader.getTests().then((tests) => {
+      const mapped = Mapper.toApiTest(tests);
+      return mapped instanceof Error ? [] : mapped;
+    });
   }
 
   updateTest(test) {
-    return new Promise((resolve, reject) => {
-      this.reader.getTest(test.id).then((existingTest) => {
-        if (!existingTest.id) return reject(testNotFound);
-        if (equal(existingTest, test)) return resolve(test);
-
-        return resolve(this.writer.updateTest(test));
-      });
-    });
+    return this.getTest(test.id).then(t => (t instanceof Error ? t : this.writer.updateTest(test)));
   }
 
   deleteTest(testId) {
     this.reader.getRuns(testId).then(runs => runs.map(run => this.deleteRun(run.id)));
-    return this.reader.deleteTest(testId);
-  }
-
-  static _mapRun(run) {
-    const runCopy = run;
-    runCopy.started = new Date(Number(runCopy.started) * 1000).toISOString();
-    runCopy.success = runCopy.results.every(result => result.success);
-    return runCopy;
+    return this.reader.deleteTest(testId).then(test => Mapper.toApiRun(test));
   }
 }
