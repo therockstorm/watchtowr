@@ -13,17 +13,7 @@ const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const resolver = new Resolver(readerStub, writerStub);
-const existingRun = {
-  id: runId,
-  started: 1480224613,
-  results: [{ success: false }, { success: true }],
-};
-const expectedRun = {
-  id: runId,
-  started: '2016-11-27T05:30:13.000Z',
-  results: [{ success: false }, { success: true }],
-  success: false,
-};
+const expectedRun = { started: '1970-01-01T00:00:00.000Z', results: [], success: true };
 // const existingStep = {
 //   request: {
 //     method: 'POST',
@@ -64,10 +54,20 @@ describe('getRun', () => {
   beforeEach(() => readerStub.getRun.reset());
 
   it('returns run', () => {
-    readerStub.getRun.withArgs(testId, runId).returns(Promise.resolve([existingRun]));
+    readerStub.getRun.withArgs(testId, runId)
+      .returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.getRun(testId, runId).then(res => (
       expect(res).to.deep.equal([expectedRun]) && expect(readerStub.getRun.called).to.be.true
+    ));
+  });
+
+  it('returns error if no run returned', () => {
+    readerStub.getRun.withArgs(testId, runId).returns(Promise.resolve([]));
+
+    return resolver.getRun(testId, runId).then(res => (
+      expect(res).to.deep.equal(new Error('Run not found.')) &&
+      expect(readerStub.getRun.called).to.be.true
     ));
   });
 });
@@ -76,32 +76,43 @@ describe('getRuns', () => {
   beforeEach(() => readerStub.getRuns.reset());
 
   it('returns runs', () => {
-    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([existingRun]));
+    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.getRuns(testId).then(res => (
       expect(res).to.deep.equal([expectedRun]) && expect(readerStub.getRuns.called).to.be.true
     ));
   });
 
-  it('returns empty array on error', () => {
+  it('returns [] if no runs returned', () => {
     readerStub.getRuns.withArgs(testId).returns(Promise.resolve([]));
 
     return resolver.getRuns(testId).then(res => (
-      expect(res).to.deep.equal([]) && expect(readerStub.getRun.called).to.be.true
+      expect(res).to.deep.equal([]) && expect(readerStub.getRuns.called).to.be.true
     ));
   });
 });
 
 describe('deleteRun', () => {
+  beforeEach(() => writerStub.deleteRun.reset());
+
   it('returns deleted run', () => {
-    writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([existingRun]));
+    writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.deleteRun(runId).then(res => (
-      expect(res).to.deep.equal([expectedRun]) && expect(writerStub.deleteRun.called).to.be.true
+      expect(res).to.deep.equal([expectedRun]) &&
+      expect(writerStub.deleteRun.called).to.be.true
+    ));
+  });
+
+  it('returns error if no run returned', () => {
+    writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([]));
+
+    return resolver.deleteRun(runId).then(res => (
+      expect(res).to.deep.equal(new Error('Run not found.')) &&
+      expect(writerStub.deleteRun.called).to.be.true
     ));
   });
 });
-
 
 // describe('updateTest', () => {
 //   function expectNotFound() {

@@ -9,18 +9,15 @@ export default class Resolver {
   }
 
   getRun(testId, runId) {
-    return this.reader.getRun(testId, runId).then(run => Mapper.toApiRun(run));
+    return this.reader.getRun(testId, runId).then(Mapper.toApiRun);
   }
 
   getRuns(testId) {
-    return this.reader.getRuns(testId).then((runs) => {
-      const mapped = Mapper.toApiRun(runs);
-      return mapped instanceof Error ? [] : mapped;
-    });
+    return this.reader.getRuns(testId).then(runs => Mapper.toApiRun(runs, []));
   }
 
   deleteRun(testId, runId) {
-    return this.writer.deleteRun(testId, runId).then(run => Mapper.toApiRun(run));
+    return this.writer.deleteRun(testId, runId).then(Mapper.toApiRun);
   }
 
   createTest(test) {
@@ -28,22 +25,19 @@ export default class Resolver {
   }
 
   getTest(testId) {
-    return this.reader.getTest(testId).then(test => Mapper.toApiRun(test));
+    return this.reader.getTest(testId).then(Mapper.toApiTest);
   }
 
   getTests() {
-    return this.reader.getTests().then((tests) => {
-      const mapped = Mapper.toApiTest(tests);
-      return mapped instanceof Error ? [] : mapped;
-    });
+    return this.reader.getTests().then(tests => Mapper.toApiTest(tests, []));
   }
 
   updateTest(test) {
-    return this.getTest(test.id).then(t => (t instanceof Error ? t : this.writer.updateTest(test)));
+    return this.getTest(test.id).then(t => (t instanceof Error ? t : this.writer.updateTest(t)));
   }
 
   deleteTest(testId) {
-    this.reader.getRuns(testId).then(runs => runs.map(run => this.deleteRun(run.id)));
-    return this.reader.deleteTest(testId).then(test => Mapper.toApiRun(test));
+    this.getRuns(testId).then(runs => runs.map(run => this.deleteRun(run.id)));
+    return this.reader.deleteTest(testId);
   }
 }
