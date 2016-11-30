@@ -1,237 +1,93 @@
-// import axios from 'axios';
-// import chai from 'chai';
-// import chaiAsPromised from 'chai-as-promised';
-// import { describe, it } from 'mocha';
-// import sinon from 'sinon';
-// import Reader from '../../src/storage/reader';
-// import Writer from '../../src/storage/writer';
-// import Runner from '../../src/runner/runner';
+import axios from 'axios';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { describe, it } from 'mocha';
+import sinon from 'sinon';
+import RunBuilder from '../../src/runner/runBuilder';
+import Reader from '../../src/storage/reader';
+import Writer from '../../src/storage/writer';
+import Runner from '../../src/runner/runner';
 
-// chai.use(chaiAsPromised);
-// const expect = chai.expect;
-// const multiStepTest = [{
-//   id: 'ba00ee81-86f9-4014-8550-2ec523734648',
-//   enabled: true,
-//   steps: [{
-//     orderNum: 1,
-//     enabled: true,
-//     request: {
-//       headers: [{
-//         key: 'x-key1',
-//         value: 'x-value1',
-//       }, {
-//         key: 'x-key2',
-//         value: 'x-value2',
-//       }],
-//       method: 'GET',
-//       url: 'https://example.com/get',
-//     },
-//     assertions: [{
-//       type: 'STATUS_CODE_EQ',
-//       value: '200',
-//     }, {
-//       type: 'ELAPSED_LT',
-//       value: '1000',
-//     }],
-//   }, {
-//     orderNum: 2,
-//     enabled: true,
-//     request: {
-//       method: 'POST',
-//       url: 'https://example.com/post',
-//     },
-//     assertions: [{
-//       type: 'STATUS_CODE_EQ',
-//       value: '201',
-//     }],
-//   }],
-// }];
-// const disabledTest = [{
-//   id: '2777b111-a26e-4994-94be-d6b4876f904c',
-//   enabled: false,
-//   steps: [{
-//     orderNum: 1,
-//     enabled: true,
-//     request: {
-//       method: 'GET',
-//       url: 'https://yahoo.com/get',
-//     },
-//     assertions: [{
-//       type: 'STATUS_CODE_EQ',
-//       value: '200',
-//     }],
-//   }],
-// }];
-// const disabledStep = [{
-//   id: 'd7cfa080-a0ce-4856-8e74-598a1b085bd7',
-//   enabled: true,
-//   steps: [{
-//     orderNum: 1,
-//     enabled: false,
-//     request: {
-//       method: 'GET',
-//       url: 'https://google.com/get',
-//     },
-//     assertions: [{
-//       type: 'STATUS_CODE_EQ',
-//       value: '200',
-//     }],
-//   }, {
-//     orderNum: 2,
-//     enabled: true,
-//     request: {
-//       method: 'POST',
-//       url: 'https://google.com/post',
-//     },
-//     assertions: [{
-//       type: 'STATUS_CODE_EQ',
-//       value: '201',
-//     }],
-//   }],
-// }];
-// const readerStub = sinon.stub(new Reader());
-// const writerStub = sinon.stub(new Writer());
-// const dateStub = sinon.stub(new Date());
-// const timerStub = sinon.stub(process, 'hrtime');
-// const requestStub = sinon.stub(axios, 'request');
+chai.use(chaiAsPromised);
+const assert = chai.assert;
+const readerStub = sinon.stub(new Reader());
+const writerStub = sinon.stub(new Writer());
+const runBuilderStub = sinon.stub(new RunBuilder());
+const dateStub = sinon.stub(new Date());
+const requestStub = sinon.stub(axios, 'request');
+const started = 123;
+const start = [1, 2000000];
+const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
+const testId2 = 'ba00ee81-86f9-4014-8550-2ec523734648';
+const tests = [{
+  id: testId1,
+  request: {
+    headers: [{
+      key: 'x-key1',
+      value: 'x-value1',
+    }],
+    method: 'GET',
+    url: 'https://example.com/get',
+  },
+  assertions: [{
+    target: 'STATUS_CODE',
+    comparison: 'EQUAL',
+    value: '200',
+  }, {
+    target: 'ELAPSED_TIME',
+    comparison: 'LESS_THAN',
+    value: '1000',
+  }],
+}, {
+  id: testId2,
+  request: {
+    method: 'POST',
+    url: 'https://example.com/post',
+    body: '{"x": "y"}',
+  },
+  assertions: [{
+    target: 'STATUS_CODE',
+    comparison: 'EQUAL',
+    value: '201',
+  }],
+}];
+dateStub.getTime.returns(started);
 
-// function setupGetAllTests(ret) {
-//   readerStub.getAllTests.returns(new Promise(resolve => resolve(ret)));
-// }
+describe('run', () => {
+  const setupGetTests = () => readerStub.getTests.returns(Promise.resolve(tests));
 
-// describe('run', () => {
-//   before(() => {
-//     dateStub.getTime.returns(123);
-//     const start = [1, 2000000];
-//     timerStub.returns(start);
-//     timerStub.withArgs(start).returns([3, 4567000]);
-//   });
+  beforeEach(() => {
+    sinon.stub(process, 'hrtime').returns(start);
+  });
 
-//   it('creates runs', () => {
-//     setupGetAllTests(multiStepTest);
-//     requestStub.withArgs({
-//       url: 'https://example.com/get',
-//       method: 'GET',
-//       headers: {
-//         'User-Agent': 'watchtowr/1.0',
-//         'x-key1': 'x-value1',
-//         'x-key2': 'x-value2',
-//       },
-//     }).returns(new Promise(resolve => resolve({
-//       status: 200,
-//     })));
-//     requestStub.withArgs({
-//       url: 'https://example.com/post',
-//       method: 'POST',
-//       headers: {
-//         'User-Agent': 'watchtowr/1.0',
-//       },
-//     }).returns(new Promise(resolve => resolve({
-//       status: 201,
-//     })));
+  afterEach(() => process.hrtime.restore());
 
-//     return new Runner(readerStub, writerStub, dateStub, timerStub, requestStub).run().then(() => (
-//       expect(writerStub.createRun.calledWith('ba00ee81-86f9-4014-8550-2ec523734648', {
-//         started: 123,
-//         elapsedMs: 4.567,
-//         request: {
-//           headers: {
-//             'User-Agent': 'watchtowr/1.0',
-//             'x-key1': 'x-value1',
-//             'x-key2': 'x-value2',
-//           },
-//           method: 'GET',
-//           url: 'https://example.com/get',
-//         },
-//         response: {
-//           statusCode: 200,
-//         },
-//         results: [{
-//           expected: {
-//             type: 'STATUS_CODE_EQ',
-//             value: '200',
-//           },
-//           actual: '200',
-//           success: true,
-//         }, {
-//           expected: {
-//             type: 'ELAPSED_LT',
-//             value: '1000',
-//           },
-//           actual: '4.567',
-//           success: true,
-//         }],
-//       })).to.be.true && expect(writerStub.createRun.calledWith('ba00ee81-86f9-4014-8550-2ec523734648', {
-//         started: 123,
-//         elapsedMs: 4.567,
-//         request: {
-//           headers: {
-//             'User-Agent': 'watchtowr/1.0',
-//           },
-//           method: 'POST',
-//           url: 'https://example.com/post',
-//         },
-//         response: {
-//           statusCode: 201,
-//         },
-//         results: [{
-//           expected: {
-//             type: 'STATUS_CODE_EQ',
-//             value: '201',
-//           },
-//           actual: '201',
-//           success: true,
-//         }],
-//       })).to.be.true
-//     ));
-//   });
+  it('creates runs', () => {
+    const res1 = { status: 200 };
+    const res2 = { status: 201 };
+    const result1 = { success: true };
+    const result2 = { success: false };
+    setupGetTests();
+    requestStub.withArgs({
+      url: tests[0].request.url,
+      method: tests[0].request.method,
+      headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'x-value1' },
+      data: tests[0].request.body,
+    }).returns(Promise.resolve(res1));
+    requestStub.withArgs({
+      url: tests[1].request.url,
+      method: tests[1].request.method,
+      headers: { 'User-Agent': 'watchtowr/1.0' },
+      data: tests[1].request.body,
+    }).returns(Promise.resolve(res2));
+    runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
-//   it('does not run disabled tests', () => {
-//     writerStub.createRun.reset();
-//     setupGetAllTests(disabledTest);
-//     requestStub.returns(new Promise(resolve => resolve({
-//       status: 200,
-//     })));
-
-//     return new Runner(readerStub, writerStub, dateStub, timerStub, requestStub).run()
-//       .then(() => expect(writerStub.createRun.called).to.be.false);
-//   });
-
-//   it('does not run disabled steps', () => {
-//     writerStub.createRun.reset();
-//     setupGetAllTests(disabledStep);
-//     requestStub.withArgs({
-//       url: 'https://google.com/post',
-//       method: 'POST',
-//       headers: {
-//         'User-Agent': 'watchtowr/1.0',
-//       },
-//     }).returns(new Promise(resolve => resolve({
-//       status: 200,
-//     })));
-
-//     return new Runner(readerStub, writerStub, dateStub, timerStub, requestStub).run()
-//       .then(() => expect(writerStub.createRun.calledWith('d7cfa080-a0ce-4856-8e74-598a1b085bd7', {
-//         started: 123,
-//         elapsedMs: 4.567,
-//         request: {
-//           headers: {
-//             'User-Agent': 'watchtowr/1.0',
-//           },
-//           method: 'POST',
-//           url: 'https://google.com/post',
-//         },
-//         response: {
-//           statusCode: 200,
-//         },
-//         results: [{
-//           expected: {
-//             type: 'STATUS_CODE_EQ',
-//             value: '201',
-//           },
-//           actual: '200',
-//           success: false,
-//         }],
-//       })).to.be.true);
-//   });
-// });
+    return new Runner(readerStub, writerStub, runBuilderStub, dateStub).run()
+      .then(() => {
+        assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[0].assertions, res1));
+        assert.isTrue(writerStub.createRun.calledWith(tests[0].id, result1));
+        assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[1].assertions, res2));
+        assert.isTrue(writerStub.createRun.calledWith(tests[1].id, result2));
+      });
+  });
+});

@@ -1,7 +1,7 @@
 import Util from '../util/util';
 
 export default class RunBuilder {
-  constructor(startedTime, startedHighRes, assertions, response) {
+  create(startedTime, startedHighRes, assertions, response) {
     this.startedTime = startedTime;
     this.elapsed = Number((process.hrtime(startedHighRes)[1] / 1000000).toFixed(3));
     this.assertions = assertions;
