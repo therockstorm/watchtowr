@@ -2,7 +2,7 @@ import { handle } from '../src/api';
 
 const queries = [
   // invalid query
-  'query { dog { id } }',
+  'query { cow { id } }',
   // tests
   'query { tests { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
   // non-existent test(id: UUID!)

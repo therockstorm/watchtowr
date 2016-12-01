@@ -18,7 +18,7 @@ export default class Runner {
         tests.map((test) => {
           const started = this.date.getTime();
           const startedHighRes = process.hrtime();
-          axios.request({
+          return axios.request({
             url: test.request.url,
             method: test.request.method,
             headers: Runner._mapHeaders(test.request.headers),
@@ -27,7 +27,6 @@ export default class Runner {
             this.runBuilder.create(started, startedHighRes, test.assertions, res);
             resolve(this.writer.createRun(test.id, this.runBuilder.build()));
           }).catch(err => reject(err));
-          return true;
         });
       }).catch(err => reject(err));
     });
