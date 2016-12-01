@@ -5,10 +5,8 @@ const testsTable = process.env.TESTS_TABLE;
 const testRunsTable = process.env.TEST_RUNS_TABLE;
 
 export default class Writer {
-  constructor() {
-    this.ddb = new aws.DynamoDB({
-      region: 'us-west-2',
-    });
+  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' })) {
+    this.ddb = ddb;
   }
 
   createRun(testId, run) {
@@ -16,15 +14,9 @@ export default class Writer {
     runCopy.id = Util.sequencialId();
     return this.ddb.putItem({
       Item: {
-        TestId: {
-          S: testId,
-        },
-        RunId: {
-          S: runCopy.id,
-        },
-        Run: {
-          S: JSON.stringify(runCopy, null, null, 1),
-        },
+        TestId: { S: testId },
+        RunId: { S: runCopy.id },
+        Run: { S: JSON.stringify(runCopy, null, null, 1) },
       },
       TableName: testRunsTable,
     }).promise().then(() => runCopy).catch(err => Util.error(err));
@@ -32,14 +24,7 @@ export default class Writer {
 
   deleteRun(testId, runId) {
     return this.ddb.deleteItem({
-      Item: {
-        TestId: {
-          S: testId,
-        },
-        RunId: {
-          S: runId,
-        },
-      },
+      Item: { TestId: { S: testId }, RunId: { S: runId } },
       TableName: testRunsTable,
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
@@ -60,11 +45,7 @@ export default class Writer {
 
   deleteTest(id) {
     return this.ddb.deleteItem({
-      Item: {
-        TestId: {
-          S: id,
-        },
-      },
+      Item: { TestId: { S: id } },
       TableName: testsTable,
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
@@ -74,14 +55,7 @@ export default class Writer {
 
   _putTest(test) {
     return this.ddb.putItem({
-      Item: {
-        TestId: {
-          S: test.id,
-        },
-        Test: {
-          S: JSON.stringify(test, null, null, 1),
-        },
-      },
+      Item: { TestId: { S: test.id }, Test: { S: JSON.stringify(test, null, null, 1) } },
       TableName: testsTable,
     }).promise().then(() => test).catch(err => Util.error(err));
   }

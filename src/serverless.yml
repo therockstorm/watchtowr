@@ -10,12 +10,7 @@ provider:
   cfLogs: true
   timeout: 6
   memorySize: 128
-  custom:
-    testsTable: tests-${self:provider.stage}
-    testRunsTable: test-runs-${self:provider.stage}
-  environment:
-    TESTS_TABLE: ${self:provider.custom.testsTable}
-    TEST_RUNS_TABLE: ${self:provider.custom.testRunsTable}
+  environment: ${file(env.yml):${self:provider.stage}}
   iamRoleStatements:
     - Effect: 'Allow'
       Action:
@@ -55,7 +50,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.custom.testsTable}
+        TableName: ${env:TESTS_TABLE}
     TestRunsTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -73,4 +68,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${self:provider.custom.testRunsTable}
+        TableName: ${env:TEST_RUNS_TABLE}

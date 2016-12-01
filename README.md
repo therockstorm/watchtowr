@@ -9,7 +9,9 @@ Install nvm, clone the repo, and then...
 Install dependencies: `nvm install && nvm use && npm install -g serverless yarn && yarn`  
 NPM scripts assume you have the following ~/.bashrc file:  
 ```
-export NODE_ENV="dev"
+export NODE_ENV=dev
+export TESTS_TABLE=tests-dev
+export TEST_RUNS_TABLE=test-runs-dev
 
 export ACME_DIR=<path_to_acme_install>
 . "$ACME_DIR/acme.sh.env"
