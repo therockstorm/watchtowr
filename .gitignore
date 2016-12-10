@@ -4,3 +4,4 @@ node_modules
 dist
 schema.graphql
 env.yml
+.DS_Store

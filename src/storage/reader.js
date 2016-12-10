@@ -1,4 +1,4 @@
-import aws from 'aws-sdk';
+import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
 
 const testsTable = process.env.TESTS_TABLE;

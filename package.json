@@ -31,21 +31,21 @@
     "update-schema": "babel-node scripts/updateSchema.js"
   },
   "devDependencies": {
-    "aws-sdk": "^2.7.7",
-    "axios": "^0.15.2",
+    "aws-sdk": "^2.7.13",
+    "axios": "^0.15.3",
     "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
+    "babel-preset-env": "^1.0.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
-    "eslint": "^3.10.2",
+    "eslint": "^3.12.0",
     "eslint-config-airbnb": "^13.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-jsx-a11y": "^2.2.3",
-    "eslint-plugin-react": "^6.7.1",
+    "eslint-plugin-react": "^6.8.0",
     "graphql": "^0.8.2",
     "graphql-custom-types": "^0.7.1",
     "mocha": "^3.2.0",
     "sinon": "^1.17.6",
-    "uuid": "^3.0.0"
+    "uuid": "^3.0.1"
   }
 }

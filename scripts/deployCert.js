@@ -1,4 +1,4 @@
-import aws from 'aws-sdk';
+import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs';
 import path from 'path';
 

@@ -1,12 +1,13 @@
-import aws from 'aws-sdk';
+import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
 
 const testsTable = process.env.TESTS_TABLE;
 const testRunsTable = process.env.TEST_RUNS_TABLE;
 
 export default class Writer {
-  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' })) {
+  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' }), date = new Date()) {
     this.ddb = ddb;
+    this.date = date;
   }
 
   createRun(testId, run) {
@@ -16,7 +17,7 @@ export default class Writer {
       Item: {
         TestId: { S: testId },
         RunId: { S: runCopy.id },
-        Run: { S: JSON.stringify(runCopy, null, null, 1) },
+        Run: { S: JSON.stringify(runCopy) },
       },
       TableName: testRunsTable,
     }).promise().then(() => runCopy).catch(err => Util.error(err));
@@ -35,7 +36,7 @@ export default class Writer {
   createTest(test) {
     const testCopy = test;
     testCopy.id = Util.sequencialId();
-    testCopy.created = new Date().toISOString();
+    testCopy.created = this.date.toISOString();
     return this._putTest(testCopy);
   }
 
@@ -55,7 +56,7 @@ export default class Writer {
 
   _putTest(test) {
     return this.ddb.putItem({
-      Item: { TestId: { S: test.id }, Test: { S: JSON.stringify(test, null, null, 1) } },
+      Item: { TestId: { S: test.id }, Test: { S: JSON.stringify(test) } },
       TableName: testsTable,
     }).promise().then(() => test).catch(err => Util.error(err));
   }

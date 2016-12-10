@@ -1,4 +1,4 @@
-import aws from 'aws-sdk';
+import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/IAM.html
 const iam = new aws.IAM();

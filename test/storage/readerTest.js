@@ -5,8 +5,8 @@ import sinon from 'sinon';
 import Reader from '../../src/storage/reader';
 
 const ddbStub = sinon.stub(new aws.DynamoDB());
-const testId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const runId = 'ba00ee81-86f9-4014-8550-2ec523734648';
+const testId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const empty = { Items: [] };
 const r = { Run: { S: `{ "id": "${runId}" }` } };
 const run = { Items: [r] };
