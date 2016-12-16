@@ -6,13 +6,15 @@ import sinon from 'sinon';
 import RunBuilder from '../../src/runner/runBuilder';
 import Reader from '../../src/storage/reader';
 import Writer from '../../src/storage/writer';
-import Runner from '../../src/runner/runner';
+import TestRunner from '../../src/runner/testRunner';
+import Notifier from '../../src/runner/notifier';
 
 chai.use(chaiAsPromised);
 const assert = chai.assert;
 const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const runBuilderStub = sinon.stub(new RunBuilder());
+const notifierStub = sinon.stub(new Notifier());
 const dateStub = sinon.stub(new Date());
 const requestStub = sinon.stub(axios, 'request');
 const started = 123;
@@ -82,11 +84,13 @@ describe('run', () => {
     }).returns(Promise.resolve(res2));
     runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
-    return new Runner(readerStub, writerStub, runBuilderStub, dateStub).run()
+    return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub).run()
       .then(() => {
         assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[0].assertions, res1));
+        assert.isTrue(notifierStub.notify.calledWith(result1));
         assert.isTrue(writerStub.createRun.calledWith(tests[0].id, result1));
         assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[1].assertions, res2));
+        assert.isTrue(notifierStub.notify.calledWith(result2));
         assert.isTrue(writerStub.createRun.calledWith(tests[1].id, result2));
       });
   });

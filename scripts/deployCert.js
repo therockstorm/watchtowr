@@ -2,6 +2,12 @@ import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependenc
 import fs from 'fs';
 import path from 'path';
 
+// https://github.com/Neilpang/acme.sh/blob/master/README.md#use-dns-mode
+// acme.sh --upgrade && . ~/.bashrc
+// acme.sh --issue --dns --domain watchtowr.io --domain watchtowr.io --somain api.watchtowr.io
+// Manually add records to Route53
+// acme.sh --renew --domain watchtowr.io --domain www.watchtowr.io --domain api.watchtowr.io
+
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/APIGateway.html
 const utf8 = 'utf8';
 const acmePath = process.env.ACME_DIR;
@@ -19,15 +25,11 @@ else if (!region) console.log('region required');
 else if (!apiId) console.log('apiId required');
 else {
   const apiDomain = `api.${domain}`;
-  const apigateway = new aws.APIGateway({
-    region,
-  });
+  const apigateway = new aws.APIGateway({ region });
 
-  apigateway.getDomainName({
-    domainName: apiDomain,
-  }, (getErr) => {
+  apigateway.getDomainName({ domainName: apiDomain }, (getErr) => {
     if (!getErr) console.log('Implment deleteDomainName or manually go to API Gateway console -> Custom Domain Names and upload a Backup Certificate');
-    else if (getErr.code !== 'NotFoundException') console.log(`Unexpected error=${getErr}`);
+    else if (getErr.code !== 'NotFoundException') console.log(`Unexpected getErr=${getErr}`);
     else {
       const name = `${certService}-${domain}`;
       const basePath = path.join(acmePath, domain);
@@ -41,18 +43,17 @@ else {
         certificateName: name,
         certificatePrivateKey: key,
         domainName: apiDomain,
-      }, (createErr) => {
-        if (createErr) console.log(`Unexpected error=${createErr}`);
-        else {
-          apigateway.createBasePathMapping({
-            domainName: domain,
-            restApiId: apiId,
-            stage,
-          }, (mappingErr, mappingRes) => {
-            if (mappingErr) console.log(`Unexpected error=${mappingErr}`);
-            else console.log(`Create an Alias record in Route53 to map ${apiDomain} to ${mappingRes.distributionDomainName}`);
-          });
-        }
+      }, (createErr, createRes) => {
+        if (createErr) console.log(`Unexpected createErr=${createErr}`);
+
+        setTimeout(apigateway.createBasePathMapping({
+          domainName: apiDomain,
+          restApiId: apiId,
+          stage,
+        }, (mappingErr) => {
+          if (mappingErr) console.log(`Unexpected mappingErr=${mappingErr}`);
+          else console.log(`Create an Alias record in Route53 to map ${apiDomain} to ${createRes.distributionDomainName}`);
+        }), 2000);
       });
     }
   });

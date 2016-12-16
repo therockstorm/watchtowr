@@ -2,13 +2,15 @@ import axios from 'axios';
 import RunBuilder from './runBuilder';
 import Reader from '../storage/reader';
 import Writer from '../storage/writer';
+import Notifier from './notifier';
 
-export default class Runner {
+export default class TestRunner {
   constructor(reader = new Reader(), writer = new Writer(), runBuilder = new RunBuilder(),
-    date = new Date()) {
+    notifier = new Notifier(), date = new Date()) {
     this.reader = reader;
     this.writer = writer;
     this.runBuilder = runBuilder;
+    this.notifier = notifier;
     this.date = date;
   }
 
@@ -21,11 +23,13 @@ export default class Runner {
           return axios.request({
             url: test.request.url,
             method: test.request.method,
-            headers: Runner._mapHeaders(test.request.headers),
+            headers: TestRunner._mapHeaders(test.request.headers),
             data: test.request.body,
           }).then((res) => {
             this.runBuilder.create(started, startedHighRes, test.assertions, res);
-            resolve(this.writer.createRun(test.id, this.runBuilder.build()));
+            const run = this.runBuilder.build();
+            this.notifier.notify(run);
+            resolve(this.writer.createRun(test.id, run));
           }).catch(err => reject(err));
         });
       }).catch(err => reject(err));

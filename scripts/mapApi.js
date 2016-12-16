@@ -10,16 +10,14 @@ if (!domain) console.log('domain required');
 else if (!region) console.log('region required');
 else if (!apiId) console.log('apiId required');
 else {
-  const apigateway = new aws.APIGateway({
-    region,
-  });
+  const apigateway = new aws.APIGateway({ region });
 
   apigateway.createBasePathMapping({
     domainName: `api.${domain}`,
     restApiId: apiId,
     stage,
-  }, (err, data) => {
-    if (err) console.log(err);
-    else console.log(data);
+  }, (err) => {
+    if (err) console.log(`Unexpected error=${err}`);
+    else console.log(`Successfully mapped to ${stage}`);
   });
 }

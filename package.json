@@ -45,7 +45,6 @@
     "graphql": "^0.8.2",
     "graphql-custom-types": "^0.7.1",
     "mocha": "^3.2.0",
-    "serverless-snyk": "^1.2.0",
     "sinon": "^1.17.6",
     "uuid": "^3.0.1"
   }
