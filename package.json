@@ -18,17 +18,16 @@
     "clean": "rm -rf dist",
     "deploy": "npm run clean && npm run build && cd dist && serverless deploy --stage $NODE_ENV --verbose && cd ..",
     "deploy-cert": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_region} ${npm_package_config_apiId}",
-    "echo": "echo NODE_ENV=$NODE_ENV TESTS_TABLE=$TESTS_TABLE TEST_RUNS_TABLE=$TEST_RUNS_TABLE ACME_DIR=$ACME_DIR",
     "get-info": "babel-node scripts/getInfo.js ${npm_package_config_provider} ${npm_package_config_domain}",
     "lint:js": "eslint . --fix",
     "logs": "cd src && serverless logs --function ${npm_package_config_service} --stage $NODE_ENV --startTime 1m && cd ..",
     "logs:api": "npm run logs --watchtowr:service=api",
     "logs:runner": "npm run logs --watchtowr:service=runner",
-    "map-api": "babel-node scripts/mapApi.js ${npm_package_config_domain} ${npm_package_config_region} ${npm_package_config_apiId}",
     "test": "NODE_ENV=test mocha --require babel-register --recursive test/",
     "test:api": "babel-node scripts/apiFunc.js",
     "test:runner": "babel-node scripts/runnerFunc.js",
-    "update-schema": "babel-node scripts/updateSchema.js"
+    "update-schema": "babel-node scripts/updateSchema.js",
+    "verify-email-domain": "babel-node scripts/verifyEmailDomain.js ${npm_package_config_domain} ${npm_package_config_region}"
   },
   "devDependencies": {
     "aws-sdk": "^2.7.13",

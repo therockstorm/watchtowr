@@ -1,25 +1,25 @@
-frameworkVersion: "=1.3.0"
+frameworkVersion: "=1.4.0"
 
 service: watchtowr
 
 provider:
   name: aws
   runtime: nodejs4.3
-  region: us-west-2
+  region: ${file(package.json):config.region}
   stage: ${env:NODE_ENV}
   cfLogs: true
   timeout: 6
   memorySize: 128
   environment: ${file(env.yml):${self:provider.stage}}
   iamRoleStatements:
-    - Effect: 'Allow'
+    - Effect: Allow
       Action:
         - dynamodb:Scan
         - dynamodb:Query
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
-      Resource: 'arn:aws:dynamodb:us-west-2:111685254296:table/*'
+      Resource: arn:aws:dynamodb:${self:provider.region}:111685254296:table/*
 
 functions:
   api:

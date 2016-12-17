@@ -8,3 +8,8 @@ it('returns ids in order', () => {
   const ids = [...Array(10)].map(() => Util.sequencialId());
   return expect(ids).to.deep.equal(Object.assign(ids).sort());
 });
+
+it('Test random stuff here', () => {
+  const val = 'dog';
+  console.log(val);
+});

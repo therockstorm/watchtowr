@@ -1,7 +1,8 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
+import { config } from '../../package.json';
 
 export default class Notifier {
-  constructor(ses = new aws.SES({ region: 'us-west-2' })) {
+  constructor(ses = new aws.SES({ region: config.region })) {
     this.ses = ses;
   }
 
