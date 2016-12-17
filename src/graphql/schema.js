@@ -13,7 +13,7 @@ import {
 import { GraphQLDateTime, GraphQLURL, GraphQLUUID } from 'graphql-custom-types';
 import Resolver from './resolver';
 
-const httpMethodEnum = new GraphQLEnumType({
+export const httpMethodEnum = new GraphQLEnumType({
   name: 'HttpMethod',
   description: 'HTTP request methods.',
   values: {
@@ -37,19 +37,19 @@ const httpMethodEnum = new GraphQLEnumType({
     },
   },
 });
-const assertionTargetEnum = new GraphQLEnumType({
+export const assertionTargetEnum = new GraphQLEnumType({
   name: 'AssertionTarget',
   description: 'The HTTP response property to run assertions against.',
   values: {
     STATUS_CODE: {
       value: 1,
     },
-    ELAPSED_TIME: {
+    ELAPSED_TIME_MS: {
       value: 2,
     },
   },
 });
-const comparisonEnum = new GraphQLEnumType({
+export const comparisonEnum = new GraphQLEnumType({
   name: 'Comparison',
   description: 'Comparisons.',
   values: {

@@ -5,12 +5,13 @@ service: watchtowr
 provider:
   name: aws
   runtime: nodejs4.3
-  region: ${file(package.json):config.region}
+  region: us-west-2
   stage: ${env:NODE_ENV}
   cfLogs: true
   timeout: 6
   memorySize: 128
-  environment: ${file(env.yml):${self:provider.stage}}
+  environment:
+    NODE_ENV: ${env:NODE_ENV}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -50,7 +51,7 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${env:TESTS_TABLE}
+        TableName: tests-${env:NODE_ENV}
     TestRunsTable:
       Type: AWS::DynamoDB::Table
       DeletionPolicy: Retain
@@ -68,4 +69,4 @@ resources:
         ProvisionedThroughput:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
-        TableName: ${env:TEST_RUNS_TABLE}
+        TableName: test-runs-${env:NODE_ENV}

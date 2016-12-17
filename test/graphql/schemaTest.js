@@ -64,7 +64,7 @@ const createTestMutation = `mutation { createTest(test: {
     url: "https://www.rockywarren.com"
   },
   assertions: [{
-    target: ELAPSED_TIME,
+    target: ELAPSED_TIME_MS,
     comparison: LESS_THAN,
     value: "1200"
     }]

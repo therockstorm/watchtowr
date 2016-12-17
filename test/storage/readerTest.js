@@ -23,7 +23,7 @@ const setupQuery = (ret, table, key, exp, proj) => ddbStub.query.withArgs({
 }).returns({ promise: () => Promise.resolve(ret) });
 
 describe('getRun', () => {
-  const setupRun = ret => setupQuery(ret, 'test-runs-dev', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
+  const setupRun = ret => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
 
   it('returns empty list', () => {
     setupRun(empty);
@@ -41,7 +41,7 @@ describe('getRun', () => {
 });
 
 describe('getRuns', () => {
-  const setupRuns = ret => setupQuery(ret, 'test-runs-dev', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Run');
+  const setupRuns = ret => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Run');
 
   it('returns empty list', () => {
     setupRuns(empty);
@@ -58,7 +58,7 @@ describe('getRuns', () => {
 });
 
 describe('getTest', () => {
-  const setupTest = ret => setupQuery(ret, 'tests-dev', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
+  const setupTest = ret => setupQuery(ret, 'tests-test', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
 
   it('returns empty list', () => {
     setupTest(empty);
@@ -76,7 +76,7 @@ describe('getTest', () => {
 });
 
 describe('getTests', () => {
-  const setupScan = ret => ddbStub.scan.withArgs({ TableName: 'tests-dev' })
+  const setupScan = ret => ddbStub.scan.withArgs({ TableName: 'tests-test' })
     .returns({ promise: () => Promise.resolve(ret) });
 
   it('returns empty list', () => {

@@ -6,8 +6,8 @@ import Util from '../../src/util/util';
 import Writer from '../../src/storage/writer';
 
 const ddbStub = sinon.stub(new aws.DynamoDB());
-const testsTable = 'tests-dev';
-const testRunsTable = 'test-runs-dev';
+const testsTable = 'tests-test';
+const testRunsTable = 'test-runs-test';
 const runId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const testId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const generatedId = '00000000-0000-0000-0000-000000000000';

@@ -1,12 +1,11 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
-import { config } from '../../package.json';
 
-const testsTable = process.env.TESTS_TABLE;
-const testRunsTable = process.env.TEST_RUNS_TABLE;
+const testsTable = `tests-${process.env.NODE_ENV}`;
+const testRunsTable = `test-runs-${process.env.NODE_ENV}`;
 
 export default class Reader {
-  constructor(ddb = new aws.DynamoDB({ region: config.region })) {
+  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' })) {
     this.ddb = ddb;
   }
 

@@ -33,7 +33,7 @@ describe('RunBuilder', () => {
 
   describe('build', () => {
     it('returns success: false for unknown target', () => {
-      assertions = [{ target: 'INVALID_TARGET', comparison: 'EQUAL', value: '200' }];
+      assertions = [{ target: 99, comparison: 1, value: '200' }];
 
       const result = createRunBuilder().build();
 
@@ -47,13 +47,13 @@ describe('RunBuilder', () => {
 
     function setAssertions(target, actual, other) {
       assertions = [
-        { target, comparison: 'EQUAL', value: actual },
-        { target, comparison: 'EQUAL', value: other },
-        { target, comparison: 'NOT_EQUAL', value: actual },
-        { target, comparison: 'NOT_EQUAL', value: other },
-        { target, comparison: 'LESS_THAN', value: actual },
-        { target, comparison: 'LESS_THAN', value: other },
-        { target, comparison: 'INVALID_COMPARISON', value: other },
+        { target, comparison: 1, value: actual },
+        { target, comparison: 1, value: other },
+        { target, comparison: 2, value: actual },
+        { target, comparison: 2, value: other },
+        { target, comparison: 3, value: actual },
+        { target, comparison: 3, value: other },
+        { target, comparison: 99, value: other },
       ];
     }
 
@@ -76,16 +76,16 @@ describe('RunBuilder', () => {
 
     it('asserts STATUS_CODE target', () => {
       const actual = response.status;
-      setAssertions('STATUS_CODE', actual, actual + 1);
+      setAssertions(1, actual, actual + 1);
 
       const result = createRunBuilder().build();
 
       assertResult(result, actual);
     });
 
-    it('asserts ELAPSED_TIME target', () => {
+    it('asserts ELAPSED_TIME_MS target', () => {
       const actual = elapsed;
-      setAssertions('ELAPSED_TIME', actual, actual + 0.001);
+      setAssertions(2, actual, actual + 0.001);
 
       const result = createRunBuilder().build();
 

@@ -15,6 +15,21 @@ const queries = [
   // run(testId: UUID!, id: UUID!)
 ];
 
+// const mutations = [
+//   `mutation { createTest(test: {
+//     name: "Root"
+//     request: {
+//       method: GET
+//       url: "https://www.example.com/"
+//     }
+//     assertions: [{
+//       target: STATUS_CODE
+//       comparison: EQUAL
+//       value: "200"
+//     }]
+//   }) { id }}`,
+// ];
+
 queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
   if (err) console.log(`err=${JSON.stringify(err)}`);
   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);

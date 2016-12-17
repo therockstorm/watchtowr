@@ -1,12 +1,15 @@
 import { handle } from '../src/runner';
 
 handle(JSON.stringify({
-  account: '123456789012',
-  region: 'us-east-1',
-  detail: {},
+  version: '0',
+  id: '0c0238c1-7f44-4f79-be12-1c59e9ab965e',
   'detail-type': 'Scheduled Event',
   source: 'aws.events',
-  time: '1970-01-01T00:00:00Z',
-  id: 'cdc73f9d-aea9-11e3-9d5a-835b769c0d9c',
-  resources: ['arn:aws:events:us-east-1:123456789012:rule/my-schedule'],
+  account: '111685254296',
+  time: '2016-12-17T20:44:41Z',
+  region: 'us-west-2',
+  resources: [
+    'arn:aws:events:us-west-2:111685254296:rule/watchtowr-dev-RunnerEventsRuleSchedule1-1W4CGTTWRFVRU',
+  ],
+  detail: {},
 }), { awsRequestId: 1 }, ((err, res) => console.log(`err="${JSON.stringify(err)} res="${JSON.stringify(res)}""`)));

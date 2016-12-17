@@ -1,4 +1,6 @@
+import { astFromValue } from 'graphql/utilities';
 import Util from '../util/util';
+import { assertionTargetEnum, comparisonEnum } from '../graphql/schema';
 
 export default class RunBuilder {
   create(startedTime, startedHighRes, assertions, response) {
@@ -21,14 +23,15 @@ export default class RunBuilder {
 
   runAssertions() {
     return this.assertions.map((a) => {
-      switch (a.target) {
+      const target = astFromValue(a.target, assertionTargetEnum) || {};
+      switch (target.value) {
         case 'STATUS_CODE':
           return {
             expected: a,
             actual: this.response.status.toString(),
             success: RunBuilder.compare(a, this.response.status, Number(a.value)),
           };
-        case 'ELAPSED_TIME':
+        case 'ELAPSED_TIME_MS':
           return {
             expected: a,
             actual: this.elapsed.toString(),
@@ -42,7 +45,8 @@ export default class RunBuilder {
   }
 
   static compare(assertion, actual, expected) {
-    switch (assertion.comparison) {
+    const comparison = astFromValue(assertion.comparison, comparisonEnum) || {};
+    switch (comparison.value) {
       case 'EQUAL':
         return actual === expected;
       case 'NOT_EQUAL':
