@@ -12,6 +12,7 @@ import {
 } from 'graphql';
 import { GraphQLDateTime, GraphQLURL, GraphQLUUID } from 'graphql-custom-types';
 import Resolver from './resolver';
+import TestRunner from '../runner/testRunner';
 
 export const httpMethodEnum = new GraphQLEnumType({
   name: 'HttpMethod',
@@ -272,7 +273,7 @@ const testUpdateInputType = new GraphQLInputObjectType({
 });
 
 export default class Schema extends GraphQLSchema {
-  constructor(resolver = new Resolver()) {
+  constructor(resolver = new Resolver(), testRunner = new TestRunner()) {
     const testType = new GraphQLObjectType({
       name: 'Test',
       description: 'A test.',
@@ -296,7 +297,7 @@ export default class Schema extends GraphQLSchema {
         runs: {
           type: new GraphQLNonNull(new GraphQLList(runType)),
           description: 'A list of past runs.',
-          // resolve: test => resolver.getRuns(test.id),
+          resolve: test => resolver.getRuns(test.id),
         },
       }),
     });
@@ -357,6 +358,16 @@ export default class Schema extends GraphQLSchema {
               },
             },
             resolve: (root, { test }) => resolver.createTest(test),
+          },
+          runTest: {
+            type: runType,
+            args: {
+              id: {
+                description: 'The id of the test to run.',
+                type: new GraphQLNonNull(GraphQLUUID),
+              },
+            },
+            resolve: (root, { id }) => testRunner.runById(id),
           },
           updateTest: {
             type: testType,

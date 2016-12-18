@@ -55,7 +55,7 @@ const tests = [{
 }];
 dateStub.getTime.returns(started);
 
-describe('run', () => {
+describe('runAll', () => {
   const setupGetTests = () => readerStub.getTests.returns(Promise.resolve(tests));
 
   beforeEach(() => {
@@ -84,7 +84,7 @@ describe('run', () => {
     }).returns(Promise.resolve(res2));
     runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
-    return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub).run()
+    return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub).runAll()
       .then(() => {
         assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[0].assertions, res1));
         assert.isTrue(notifierStub.notify.calledWith(tests[0], result1));

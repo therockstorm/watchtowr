@@ -5,7 +5,7 @@ import Util from './util/util';
 export function handle(event, context, cb) {
   Util.log(JSON.stringify(event));
 
-  new TestRunner().run().then(res => cb(null, res)).catch((err) => {
+  new TestRunner().runAll().then(res => cb(null, res)).catch((err) => {
     Util.error(err);
     cb(err);
   });

@@ -16,25 +16,34 @@ export default class TestRunner {
     this.date = date;
   }
 
-  run() {
+  runAll() {
     return new Promise((resolve, reject) => {
-      this.reader.getTests().then((tests) => {
-        tests.map((test) => {
-          const started = this.date.getTime();
-          const startedHighRes = process.hrtime();
-          const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
-          return axios.request({
-            url: test.request.url,
-            method: method.value,
-            headers: TestRunner._mapHeaders(test.request.headers),
-            data: test.request.body,
-          }).then((res) => {
-            this.runBuilder.create(started, startedHighRes, test.assertions, res);
-            const run = this.runBuilder.build();
-            this.notifier.notify(test, run);
-            resolve(this.writer.createRun(test.id, run));
-          }).catch(err => reject(err));
-        });
+      this.reader.getTests()
+        .then(tests => tests.map(test => resolve(this.run(test))))
+        .catch(err => reject(err));
+    });
+  }
+
+  runById(testId) {
+    return new Promise((resolve, reject) => this.reader.getTest(testId)
+      .then(test => resolve(this.run(test)).catch(err => reject(err))));
+  }
+
+  run(test) {
+    return new Promise((resolve, reject) => {
+      const started = this.date.getTime();
+      const startedHighRes = process.hrtime();
+      const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
+      return axios.request({
+        url: test.request.url,
+        method: method.value,
+        headers: TestRunner._mapHeaders(test.request.headers),
+        data: test.request.body,
+      }).then((res) => {
+        this.runBuilder.create(started, startedHighRes, test.assertions, res);
+        const run = this.runBuilder.build();
+        this.notifier.notify(test, run);
+        resolve(this.writer.createRun(test.id, run));
       }).catch(err => reject(err));
     });
   }
