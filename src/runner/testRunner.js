@@ -17,19 +17,14 @@ export default class TestRunner {
   }
 
   runAll() {
-    return new Promise((resolve, reject) => {
-      this.reader.getTests()
-        .then(tests => tests.map(test => resolve(this.run(test))))
-        .catch(err => reject(err));
-    });
+    return this.reader.getTests().then(tests => tests.map(test => this._run(test)));
   }
 
   runById(testId) {
-    return new Promise((resolve, reject) => this.reader.getTest(testId)
-      .then(test => resolve(this.run(test)).catch(err => reject(err))));
+    return this.reader.getTest(testId).then(test => this._run(test[0]));
   }
 
-  run(test) {
+  _run(test) {
     return new Promise((resolve, reject) => {
       const started = this.date.getTime();
       const startedHighRes = process.hrtime();

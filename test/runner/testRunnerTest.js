@@ -21,7 +21,7 @@ const started = 123;
 const start = [1, 2000000];
 const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId2 = 'ba00ee81-86f9-4014-8550-2ec523734648';
-const tests = [{
+const test = {
   id: testId1,
   request: {
     headers: [{
@@ -40,7 +40,8 @@ const tests = [{
     comparison: 3,
     value: '1000',
   }],
-}, {
+};
+const tests = [test, {
   id: testId2,
   request: {
     method: 2,
@@ -55,21 +56,19 @@ const tests = [{
 }];
 dateStub.getTime.returns(started);
 
-describe('runAll', () => {
-  const setupGetTests = () => readerStub.getTests.returns(Promise.resolve(tests));
-
+describe('TestRunner', () => {
   beforeEach(() => {
     sinon.stub(process, 'hrtime').returns(start);
   });
 
   afterEach(() => process.hrtime.restore());
 
-  it('creates runs', () => {
+  it('runAll creates runs', () => {
     const res1 = { status: 200 };
     const res2 = { status: 201 };
     const result1 = { success: true };
     const result2 = { success: false };
-    setupGetTests();
+    readerStub.getTests.returns(Promise.resolve(tests));
     requestStub.withArgs({
       url: tests[0].request.url,
       method: 'GET',
@@ -92,6 +91,27 @@ describe('runAll', () => {
         assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[1].assertions, res2));
         assert.isTrue(notifierStub.notify.calledWith(tests[1], result2));
         assert.isTrue(writerStub.createRun.calledWith(tests[1].id, result2));
+      });
+  });
+
+  it('runById creates run', () => {
+    const res = { status: 200 };
+    const result = { success: true };
+    readerStub.getTest.withArgs(testId1).returns(Promise.resolve([test]));
+    requestStub.withArgs({
+      url: test.request.url,
+      method: 'GET',
+      headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'x-value1' },
+      data: test.request.body,
+    }).returns(Promise.resolve(res));
+    runBuilderStub.build.returns(result);
+
+    return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub)
+      .runById(testId1)
+      .then(() => {
+        assert.isTrue(runBuilderStub.create.calledWith(started, start, test.assertions, res));
+        assert.isTrue(notifierStub.notify.calledWith(test, result));
+        assert.isTrue(writerStub.createRun.calledWith(test.id, result));
       });
   });
 });

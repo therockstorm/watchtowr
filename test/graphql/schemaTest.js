@@ -5,11 +5,13 @@ import sinon from 'sinon';
 import { graphql } from 'graphql';
 import Schema from '../../src/graphql/schema';
 import Resolver from '../../src/graphql/resolver';
+import TestRunner from '../../src/runner/testRunner';
 
 chai.use(chaiAsPromised);
 const expect = chai.expect;
 const resolverStub = sinon.stub(new Resolver());
-const schema = new Schema(resolverStub);
+const testRunnerStub = sinon.stub(new TestRunner());
+const schema = new Schema(resolverStub, testRunnerStub);
 const runId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const runsSnippet = `
@@ -69,6 +71,7 @@ const createTestMutation = `mutation { createTest(test: {
     value: "1200"
     }]
 }) { id } }`;
+const runTestMutation = `mutation { runTest(id: "${testId}") { id } }`;
 const updateTestMutation = `mutation { updateTest(test: {
   id: "${testId}",
   name: "My test name",
@@ -121,6 +124,14 @@ it('calls createTest', () => (
     if (res.errors) console.log(res.errors.map(e => e.message));
     return expect(res).to.deep.equal({ data: { createTest: null } }) &&
       expect(resolverStub.createTest.called).to.be.true;
+  })
+));
+
+it('calls runById', () => (
+  graphql(schema, runTestMutation).then((res) => {
+    if (res.errors) console.log(res.errors.map(e => e.message));
+    return expect(res).to.deep.equal({ data: { runTest: null } }) &&
+      expect(testRunnerStub.runById.calledWith(testId)).to.be.true;
   })
 ));
 
