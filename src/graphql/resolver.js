@@ -13,7 +13,7 @@ export default class Resolver {
   }
 
   getRuns(testId) {
-    return this.reader.getRuns(testId).then(runs => Mapper.toApiRun(runs, []));
+    return this.reader.getRuns(testId).then(runs => Mapper.toApiRun(runs, true, []));
   }
 
   deleteRun(testId, runId) {
@@ -29,7 +29,7 @@ export default class Resolver {
   }
 
   getTests() {
-    return this.reader.getTests().then(tests => Mapper.toApiTest(tests, []));
+    return this.reader.getTests().then(tests => Mapper.toApiTest(tests, true, []));
   }
 
   updateTest(test) {

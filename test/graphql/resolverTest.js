@@ -26,7 +26,7 @@ describe('getRun', () => {
       .returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.getRun(testId, runId).then(res => (
-      expect(res).to.deep.equal([expectedRun])
+      expect(res).to.deep.equal(expectedRun)
     ));
   });
 
@@ -66,7 +66,7 @@ describe('deleteRun', () => {
     writerStub.deleteRun.withArgs(runId).returns(Promise.resolve([{ started: 0, results: [] }]));
 
     return resolver.deleteRun(runId).then(res => (
-      expect(res).to.deep.equal([expectedRun])
+      expect(res).to.deep.equal(expectedRun)
     ));
   });
 
@@ -83,10 +83,10 @@ describe('createTest', () => {
   beforeEach(() => writerStub.createTest.reset());
 
   it('returns created test', () => {
-    writerStub.createTest.withArgs(expectedTest).returns(Promise.resolve([expectedTest]));
+    writerStub.createTest.withArgs(expectedTest).returns(Promise.resolve(expectedTest));
 
     return resolver.createTest({ id: testId }).then(res => (
-      expect(res).to.deep.equal([expectedTest])
+      expect(res).to.deep.equal(expectedTest)
     ));
   });
 });
@@ -98,7 +98,7 @@ describe('getTest', () => {
     readerStub.getTest.withArgs(testId).returns(Promise.resolve([{ id: testId }]));
 
     return resolver.getTest(testId).then(res => (
-      expect(res).to.deep.equal([expectedTest])
+      expect(res).to.deep.equal(expectedTest)
     ));
   });
 
@@ -137,10 +137,10 @@ describe('updateTest', () => {
   it('returns updated test', () => {
     const test = { id: testId };
     readerStub.getTest.withArgs(test.id).returns(Promise.resolve([test]));
-    writerStub.updateTest.returns(Promise.resolve([expectedTest]));
+    writerStub.updateTest.returns(Promise.resolve(expectedTest));
 
     return resolver.updateTest(test).then(res => (
-      expect(res).to.deep.equal([expectedTest])
+      expect(res).to.deep.equal(expectedTest)
     ));
   });
 
@@ -160,7 +160,7 @@ describe('deleteTest', () => {
     writerStub.deleteTest.withArgs(testId).returns(Promise.resolve([{ id: testId }]));
 
     return resolver.deleteTest(testId).then(res => (
-      expect(res).to.deep.equal([expectedTest])
+      expect(res).to.deep.equal(expectedTest)
     ));
   });
 

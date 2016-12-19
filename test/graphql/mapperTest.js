@@ -8,22 +8,22 @@ const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const emptyArray = [];
 const run = (success = false) => ({
   id: runId,
-  started: 1480224613,
+  started: 1482017287271,
   results: [{ success }, { success: true }],
 });
 const expectedRun = (success = false) => ({
   id: runId,
-  started: '2016-11-27T05:30:13.000Z',
+  started: '2016-12-17T23:28:07.271Z',
   results: [{ success }, { success: true }],
   success,
 });
-const tests = {
+const test = {
   id: testId,
 };
 
 describe('toApiRun', () => {
   it('returns error if no run', () => (
-    expect(Mapper.toApiRun(null, emptyArray)).to.equal(emptyArray)
+    expect(Mapper.toApiRun(null, false, emptyArray)).to.equal(emptyArray)
   ));
 
   it('returns error if empty list', () => (
@@ -31,24 +31,30 @@ describe('toApiRun', () => {
   ));
 
   it('maps single run', () => (
-    expect(Mapper.toApiRun([run()])).to.deep.equal([expectedRun()])
+    expect(Mapper.toApiRun([run()])).to.deep.equal(expectedRun())
   ));
 
   it('maps multiple runs', () => (
-    expect(Mapper.toApiRun([run(), run(true)])).to.deep.equal([expectedRun(), expectedRun(true)])
+    expect(Mapper.toApiRun([run(), run(true)], true))
+      .to.deep.equal([expectedRun(), expectedRun(true)])
   ));
 });
 
 describe('toApiTest', () => {
   it('returns error if no test', () => (
-    expect(Mapper.toApiTest(null, emptyArray)).to.equal(emptyArray)
+    expect(Mapper.toApiTest(null, false, emptyArray)).to.equal(emptyArray)
   ));
 
   it('returns error if empty list', () => (
     expect(Mapper.toApiTest([]).message).to.equal('Test not found.')
   ));
 
-  it('maps tests', () => (
-    expect(Mapper.toApiTest([tests])).to.deep.equal([tests])
+  it('maps single test', () => (
+    expect(Mapper.toApiTest([test])).to.deep.equal(test)
   ));
+
+  it('maps multiple tests', () => {
+    const tests = [test, test];
+    return expect(Mapper.toApiTest(tests, true)).to.deep.equal(tests);
+  });
 });

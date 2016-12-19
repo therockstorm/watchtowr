@@ -11,8 +11,7 @@ const queries = [
   // non-existent test runs(testId: UUID!)
   'query { runs(testId: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // runs(testId: UUID!)
-  `query {
-    runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+  `query { runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
       elapsedMs
       response {
         statusCode
@@ -32,6 +31,10 @@ const queries = [
   // non-existent run(testId: UUID!, id: UUID!)
   'query { run(testId: "11e6af50-8fbf-b952-80db-218d3d616683", id: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // run(testId: UUID!, id: UUID!)
+  `query { run(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f", id: "11e6c4b0-7779-1150-913a-0b296f5eb20b") {
+      started
+    }
+  }`,
 ];
 
 // const mutations = [

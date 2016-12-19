@@ -14,7 +14,7 @@ export default class Util {
   static log(msg, isError = false) {
     if (process.env.NODE_ENV === 'test') return;
 
-    if (isError) console.error(msg);
-    else console.log(msg);
+    if (isError) console.error(msg); // eslint-disable-line no-console
+    else console.log(msg); // eslint-disable-line no-console
   }
 }

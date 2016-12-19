@@ -6,7 +6,6 @@ env:
   mocha: true
   node: true
 rules:
-  no-console: 0
   no-underscore-dangle: 0
   no-confusing-arrow:
     - error
