@@ -32,6 +32,7 @@ const runsSnippet = `
     success
   }`;
 const runQuery = `query { run(testId: "${testId}", id: "${runId}") { ${runsSnippet} } }`;
+const lastFailureQuery = `query { lastFailure(testId: "${testId}") { ${runsSnippet} } }`;
 const runsQuery = `query { runs(testId: "${testId}") { ${runsSnippet} } }`;
 const testsSnippet = `
   id
@@ -92,7 +93,7 @@ const deleteRunMutation = `mutation { deleteRun(testId: "${testId}", id: "${runI
 it('calls getTest', () => (
   graphql(schema, testQuery).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getTest.called).to.be.true;
+    return expect(resolverStub.getTest.calledWith(testId)).to.be.true;
   })
 ));
 
@@ -107,7 +108,14 @@ it('calls getTests', () => {
 it('calls getRun', () => (
   graphql(schema, runQuery).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getRun.called).to.be.true;
+    return expect(resolverStub.getRun.calledWith(testId, runId)).to.be.true;
+  })
+));
+
+it('calls getLastFailure', () => (
+  graphql(schema, lastFailureQuery).then((res) => {
+    if (res.errors) console.log(res.errors.map(e => e.message));
+    return expect(resolverStub.getLastFailure.calledWith(testId)).to.be.true;
   })
 ));
 
@@ -147,7 +155,7 @@ it('calls deleteTest', () => (
   graphql(schema, deleteTestMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
     return expect(res).to.deep.equal({ data: { deleteTest: null } }) &&
-      expect(resolverStub.deleteTest.called).to.be.true;
+      expect(resolverStub.deleteTest.calledWith(testId)).to.be.true;
   })
 ));
 
@@ -155,6 +163,6 @@ it('calls deleteRun', () => (
   graphql(schema, deleteRunMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
     return expect(res).to.deep.equal({ data: { deleteRun: null } }) &&
-      expect(resolverStub.deleteRun.called).to.be.true;
+      expect(resolverStub.deleteRun.calledWith(testId, runId)).to.be.true;
   })
 ));

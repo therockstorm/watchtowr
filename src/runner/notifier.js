@@ -143,7 +143,7 @@ export default class Notifier {
       Message: {
         Body: {
           Html: {
-            Data: email.replace(/TEST_NAME/g, test.name).replace(/RESULTS_LINK/g, resultsLink),
+            Data: Notifier._replaceAll(email, { TEST_NAME: test.name, RESULTS_LINK: resultsLink }),
           },
           Text: {
             Data: `Failed: ${test.name}. View results at ${resultsLink}`,
@@ -157,5 +157,9 @@ export default class Notifier {
     }, (err) => {
       if (err) Util.error(err);
     });
+  }
+
+  static _replaceAll(str, map) {
+    return str.replace(new RegExp(Object.keys(map).join('|'), 'gi'), matched => map[matched]);
   }
 }

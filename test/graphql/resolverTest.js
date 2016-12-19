@@ -39,6 +39,40 @@ describe('getRun', () => {
   });
 });
 
+describe('getLastFailure', () => {
+  beforeEach(() => readerStub.getRuns.reset());
+
+  it('returns last failure', () => {
+    const expected = { started: 1, results: [{ success: true }, { success: false }] };
+    readerStub.getRuns.withArgs(testId)
+      .returns(Promise.resolve([{ started: 0, results: [{ success: false }] }, expected]));
+
+    return resolver.getLastFailure(testId).then(res => (
+      expect(res).to.deep.equal({
+        started: '1970-01-01T00:00:00.001Z',
+        results: expected.results,
+        success: false,
+      })
+    ));
+  });
+
+  it('returns null if no failures', () => {
+    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([{ started: 0, results: [] }]));
+
+    return resolver.getLastFailure(testId).then(res => (
+      expect(res).to.equal(null)
+    ));
+  });
+
+  it('returns null if no runs', () => {
+    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([]));
+
+    return resolver.getLastFailure(testId).then(res => (
+      expect(res).to.equal(null)
+    ));
+  });
+});
+
 describe('getRuns', () => {
   beforeEach(() => readerStub.getRuns.reset());
 

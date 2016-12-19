@@ -334,6 +334,16 @@ export default class Schema extends GraphQLSchema {
             },
             resolve: (root, { testId, id }) => resolver.getRun(testId, id),
           },
+          lastFailure: {
+            type: runType,
+            args: {
+              testId: {
+                description: 'The id of the test.',
+                type: new GraphQLNonNull(GraphQLUUID),
+              },
+            },
+            resolve: (root, { testId }) => resolver.getLastFailure(testId),
+          },
           runs: {
             type: new GraphQLNonNull(new GraphQLList(runType)),
             args: {

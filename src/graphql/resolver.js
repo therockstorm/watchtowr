@@ -12,6 +12,15 @@ export default class Resolver {
     return this.reader.getRun(testId, runId).then(Mapper.toApiRun);
   }
 
+  getLastFailure(testId) {
+    return this.reader.getRuns(testId).then((runs) => {
+      for (let i = runs.length - 1; i >= 0; i -= 1) {
+        if (!runs[i].results.every(result => result.success)) return Mapper.toApiRun([runs[i]]);
+      }
+      return null;
+    });
+  }
+
   getRuns(testId) {
     return this.reader.getRuns(testId).then(runs => Mapper.toApiRun(runs, true, []));
   }

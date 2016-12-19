@@ -2,39 +2,44 @@ import { handle } from '../src/api';
 
 const queries = [
   // invalid query
-  'query { cow { id } }',
+  // 'query { cow { id } }',
   // tests
-  'query { tests { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
+  // 'query { tests { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
   // non-existent test(id: UUID!)
-  'query { test(id: "11e6af50-8fbf-b952-80db-218d3d616683") { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
+  // 'query { test(id: "11e6af50-8fbf-b952-80db-218d3d616683") { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
   // test(id: UUID!)
   // non-existent test runs(testId: UUID!)
-  'query { runs(testId: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
+  // 'query { runs(testId: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // runs(testId: UUID!)
-  `query { runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
-      elapsedMs
-      response {
-        statusCode
-      }
-      results {
-        expected {
-          target
-          comparison
-          value
-        }
-        actual
-        success
-      }
-      success
-    }
-  }`,
+  // `query { runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+  //     elapsedMs
+  //     response {
+  //       statusCode
+  //     }
+  //     results {
+  //       expected {
+  //         target
+  //         comparison
+  //         value
+  //       }
+  //       actual
+  //       success
+  //     }
+  //     success
+  //   }
+  // }`,
   // non-existent run(testId: UUID!, id: UUID!)
-  'query { run(testId: "11e6af50-8fbf-b952-80db-218d3d616683", id: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
+  // 'query { run(testId: "11e6af50-8fbf-b952-80db-218d3d616683", id: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // run(testId: UUID!, id: UUID!)
-  `query { run(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f", id: "11e6c4b0-7779-1150-913a-0b296f5eb20b") {
-      started
-    }
-  }`,
+  // `query { run(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f", id: "11e6c4b0-7779-1150-913a-0b296f5eb20b") {
+  //     started
+  //   }
+  // }`,
+  // lastFailure(testId: UUID!)
+  `query { lastFailure(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+      id
+     }
+   }`,
 ];
 
 const mutations = [
@@ -57,7 +62,7 @@ const mutations = [
 }`,
 ];
 
-mutations.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
+queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
   if (err) console.log(`err=${JSON.stringify(err)}`);
   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
 })));
