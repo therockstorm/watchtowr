@@ -3,13 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import Util from './util';
 
-// https://github.com/Neilpang/acme.sh/blob/master/README.md#use-dns-mode
-// acme.sh --upgrade && . ~/.bashrc
-// acme.sh --issue --dns --domain watchtowr.io --domain watchtowr.io --somain api.watchtowr.io
-// Manually add records to Route53
-// acme.sh --renew --domain watchtowr.io --domain www.watchtowr.io --domain api.watchtowr.io
-
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/APIGateway.html
 const acmePath = Util.required(process.env.ACME_DIR, 'acmePath');
 const stage = Util.required(process.env.NODE_ENV, 'stage');
 const certService = Util.required(process.argv[2], 'certService');
