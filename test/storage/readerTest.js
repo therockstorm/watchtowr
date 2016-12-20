@@ -92,3 +92,10 @@ describe('getTests', () => {
       .then(res => assert.deepEqual(res, tests.Items.map(item => JSON.parse(item.Test.S))));
   });
 });
+
+// it.only('test', () => {
+//   // return new Reader().batchGetTests('11e6c424-7df1-bc80-ac7e-f510c61b0a7f')
+//   return new Reader().batchGetRuns('11e6c424-7df1-bc80-ac7e-f510c61b0a7f', '11e6c4b0-7779-1150-913a-0b296f5eb20b')
+//     .then(res => console.log('testRes=' + JSON.stringify(res)))
+//     .catch(err => console.error('testErr=' + err));
+// });

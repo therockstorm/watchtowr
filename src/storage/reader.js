@@ -22,16 +22,35 @@ export default class Reader {
   }
 
   getRuns(testId) {
-    console.log('getRuns');
+    console.log('getRuns. keys=' + testId);
     return this.ddb.query({
       TableName: testRunsTable,
       KeyConditionExpression: 'TestId = :testIdVal',
-      ExpressionAttributeValues: { ':testIdVal': { S: testId } },
+      ExpressionAttributeValues: { ':testIdVal': { S: testId[0] } },
       ProjectionExpression: 'Run',
-    }).promise().then(data => (
-      data.Items.map(item => JSON.parse(item.Run.S))
-    )).catch(err => Util.error(err));
+    }).promise().then(data => {
+      const runs = data.Items.map(item => JSON.parse(item.Run.S));
+      return [{ runs }];
+    }).catch(err => Util.error(err));
   }
+
+  // batchGetTests(testId) {
+  //   console.log('batchGetTests');
+  //   return this.ddb.batchGetItem({
+  //     RequestItems: { 'tests-dev': { Keys: [{ TestId: { S: testId } }] } },
+  //   }).promise().then(data => (
+  //     data.Responses['tests-dev'].map(item => JSON.parse(item.Test.S))
+  //   )).catch(err => Util.error(err));
+  // }
+
+  // batchGetRuns(testId, runId) {
+  //   console.log('batchGetRuns');
+  //   return this.ddb.batchGetItem({
+  //     RequestItems: { 'test-runs-dev': { Keys: [{ TestId: { S: testId }, RunId: { S: runId } }] } },
+  //   }).promise().then(data => (
+  //     data.Responses['test-runs-dev'].map(item => JSON.parse(item.Run.S))
+  //   )).catch(err => Util.error(err));
+  // }
 
   getTest(testId) {
     console.log('getTest');

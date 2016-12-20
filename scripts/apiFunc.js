@@ -67,14 +67,14 @@ const mutations = [
 }`,
 ];
 
-const q = 'query GetTest($id: UUID!) { test(id: $id) { runs { started } } }';
-const v = '{ "id": "11e6c424-7df1-bc80-ac7e-f510c61b0a7f" }';
-handle({ body: `{ "query": ${JSON.stringify(q)}, "variables": ${JSON.stringify(v)} }` }, { awsRequestId: 1 }, ((err, res) => {
+queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
   if (err) console.log(`err=${JSON.stringify(err)}`);
   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
-}));
+})));
 
-// queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
+// const q = 'query GetTest($id: UUID!) { test(id: $id) { runs { started } } }';
+// const v = '{ "id": "11e6c424-7df1-bc80-ac7e-f510c61b0a7f" }';
+// handle({ body: `{ "query": ${JSON.stringify(q)}, "variables": ${JSON.stringify(v)} }` }, { awsRequestId: 1 }, ((err, res) => {
 //   if (err) console.log(`err=${JSON.stringify(err)}`);
 //   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
-// })));
+// }));
