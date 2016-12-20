@@ -10,6 +10,7 @@ export default class Reader {
   }
 
   getRun(testId, runId) {
+    console.log('getRun');
     return this.ddb.query({
       TableName: testRunsTable,
       KeyConditionExpression: 'TestId = :testIdVal AND RunId = :runIdVal',
@@ -21,6 +22,7 @@ export default class Reader {
   }
 
   getRuns(testId) {
+    console.log('getRuns');
     return this.ddb.query({
       TableName: testRunsTable,
       KeyConditionExpression: 'TestId = :testIdVal',
@@ -32,6 +34,7 @@ export default class Reader {
   }
 
   getTest(testId) {
+    console.log('getTest');
     return this.ddb.query({
       TableName: testsTable,
       KeyConditionExpression: 'TestId = :testIdVal',
@@ -43,6 +46,7 @@ export default class Reader {
   }
 
   getTests() {
+    console.log('getTests');
     return this.ddb.scan({ TableName: testsTable }).promise().then(data => (
       data.Items.map(item => JSON.parse(item.Test.S))
     )).catch(err => Util.error(err));

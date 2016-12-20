@@ -32,7 +32,6 @@ const runsSnippet = `
     success
   }`;
 const runQuery = `query { run(testId: "${testId}", id: "${runId}") { ${runsSnippet} } }`;
-const lastFailureQuery = `query { lastFailure(testId: "${testId}") { ${runsSnippet} } }`;
 const runsQuery = `query { runs(testId: "${testId}") { ${runsSnippet} } }`;
 const testsSnippet = `
   id
@@ -50,6 +49,9 @@ const testsSnippet = `
     target
     comparison
     value
+  }
+  lastFailure {
+    ${runsSnippet}
   }
   runs {
     ${runsSnippet}
@@ -109,13 +111,6 @@ it('calls getRun', () => (
   graphql(schema, runQuery).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
     return expect(resolverStub.getRun.calledWith(testId, runId)).to.be.true;
-  })
-));
-
-it('calls getLastFailure', () => (
-  graphql(schema, lastFailureQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getLastFailure.calledWith(testId)).to.be.true;
   })
 ));
 

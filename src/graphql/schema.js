@@ -294,6 +294,11 @@ export default class Schema extends GraphQLSchema {
           type: new GraphQLNonNull(new GraphQLList(assertionType)),
           description: 'A list of assertions to run on the response.',
         },
+        lastFailure: {
+          type: runType,
+          description: 'The last failure run.',
+          resolve: test => resolver.getLastFailure(test.id),
+        },
         runs: {
           type: new GraphQLNonNull(new GraphQLList(runType)),
           description: 'A list of past runs.',
@@ -333,16 +338,6 @@ export default class Schema extends GraphQLSchema {
               },
             },
             resolve: (root, { testId, id }) => resolver.getRun(testId, id),
-          },
-          lastFailure: {
-            type: runType,
-            args: {
-              testId: {
-                description: 'The id of the test.',
-                type: new GraphQLNonNull(GraphQLUUID),
-              },
-            },
-            resolve: (root, { testId }) => resolver.getLastFailure(testId),
           },
           runs: {
             type: new GraphQLNonNull(new GraphQLList(runType)),

@@ -34,10 +34,19 @@ export function handle(event, context, cb, schema = new Schema()) {
     return cb(null, Response.error('Request body with valid JSON required.', context));
   }
   if (!body.query) {
-    return cb(null, Response.error('Request body query parameter required.', context));
+    return cb(null, Response.error("'query' parameter required.", context));
   }
 
-  return graphql(schema, body.query)
+  let variables;
+  if (body.variables) {
+    try {
+      variables = JSON.parse(body.variables);
+    } catch (e) {
+      return cb(null, Response.error("'variables' parameter provided but invalid.", context));
+    }
+  }
+
+  return graphql(schema, body.query, schema.root, context, variables)
     .then(res => cb(null, Response.create(res, context)))
     .catch(err => cb(null, Response.error(err, context)));
 }

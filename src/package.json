@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.15.3",
+    "dataloader": "^1.2.0",
     "graphql": "^0.8.2",
     "graphql-custom-types": "^0.7.1",
     "uuid": "^3.0.1"

@@ -38,7 +38,13 @@ it('returns error if invalid JSON', () => (
 
 it('returns error if missing query prop', () => (
   handle({ body: '{ "x": "y" }' }, context, ((err, res) => (
-    expect(res).to.deep.equal(error('Request body query parameter required.'))
+    expect(res).to.deep.equal(error("'query' parameter required."))
+  )))
+));
+
+it('returns error if variables provided in invalid format', () => (
+  handle({ body: `{ "query": ${JSON.stringify('query { tests }')}, "variables": "{" }` }, context, ((err, res) => (
+    expect(res).to.deep.equal(error("'variables' parameter provided but invalid."))
   )))
 ));
 
