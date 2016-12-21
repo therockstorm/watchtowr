@@ -9,7 +9,7 @@ const queries = [
   // 'query { test(id: "11e6af50-8fbf-b952-80db-218d3d616683") { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
   // test(id: UUID!)
   `query {
-    test(id: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+    test(id: "11e6c73c-9002-da10-b145-35b599cc3f91") {
       lastFailure {
         started
       }
@@ -17,7 +17,18 @@ const queries = [
         started
       }
     }
+    runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
+      started
+    }
   }`,
+  // `query {
+  //   runs1: runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+  //     elapsedMs
+  //   }
+  //   runs2: runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
+  //     elapsedMs
+  //   }
+  // }`,
   // non-existent test runs(testId: UUID!)
   // 'query { runs(testId: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // runs(testId: UUID!)
@@ -78,3 +89,15 @@ queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, {
 //   if (err) console.log(`err=${JSON.stringify(err)}`);
 //   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
 // }));
+
+// it.only('test', () => {
+//   // return new Reader().batchGetTests('11e6c424-7df1-bc80-ac7e-f510c61b0a7f')
+//   return new Reader().batchGetRuns('11e6c424-7df1-bc80-ac7e-f510c61b0a7f', '11e6c4b0-7779-1150-913a-0b296f5eb20b')
+//     .then(res => console.log('testRes=' + JSON.stringify(res)))
+//     .catch(err => console.error('testErr=' + err));
+// });
+// it.only('test', () => {
+//   return new Reader().getRunDoc('11e6c424-7df1-bc80-ac7e-f510c61b0a7f', '11e6c4b0-7779-1150-913a-0b296f5eb20b')
+//     .then(res => console.log('testRes=' + JSON.stringify(res)))
+//     .catch(err => console.error('testErr=' + err));
+// });

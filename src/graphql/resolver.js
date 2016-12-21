@@ -4,10 +4,11 @@ import Reader from '../storage/reader';
 import Writer from '../storage/writer';
 
 export default class Resolver {
-  constructor(reader = new Reader(), writer = new Writer()) {
+  constructor(reader = new Reader(), writer = new Writer(),
+    runsLoader = new DataLoader(keys => reader.getRuns(keys))) {
     this.reader = reader;
     this.writer = writer;
-    this.runByTestIdLoader = new DataLoader(keys => this.reader.getRuns(keys));
+    this.runsLoader = runsLoader;
   }
 
   getRun(testId, runId) {
@@ -15,17 +16,17 @@ export default class Resolver {
   }
 
   getLastFailure(testId) {
-    return this.runByTestIdLoader.load(testId).then((runs) => {
-      // console.log('here=' + JSON.stringify(runs.runs));
-      for (let i = runs.length - 1; i >= 0; i -= 1) {
-        if (!runs[i].results.every(result => result.success)) return Mapper.toApiRun([runs[i]]);
+    return this.runsLoader.load(testId).then((r) => {
+      // console.log(JSON.stringify(r));
+      for (let i = r.runs.length - 1; i >= 0; i -= 1) {
+        if (!r.runs[i].results.every(result => result.success)) return Mapper.toApiRun([r.runs[i]]);
       }
       return null;
     });
   }
 
   getRuns(testId) {
-    return this.runByTestIdLoader.load(testId).then(runs => Mapper.toApiRun(runs.runs, true, []));
+    return this.runsLoader.load(testId).then(r => Mapper.toApiRun(r.runs, true, []));
   }
 
   deleteRun(testId, runId) {

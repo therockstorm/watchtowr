@@ -1,6 +1,5 @@
 import axios from 'axios';
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { assert } from 'chai';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
 import RunBuilder from '../../src/runner/runBuilder';
@@ -9,8 +8,6 @@ import Writer from '../../src/storage/writer';
 import TestRunner from '../../src/runner/testRunner';
 import Notifier from '../../src/runner/notifier';
 
-chai.use(chaiAsPromised);
-const assert = chai.assert;
 const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const runBuilderStub = sinon.stub(new RunBuilder());

@@ -41,19 +41,40 @@ describe('getRun', () => {
 });
 
 describe('getRuns', () => {
-  const setupRuns = ret => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Run');
+  const setupRuns = (ret, id = testId) => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
+  const mapRuns = val => (
+    { runs: val.Items.map(item => JSON.parse(item.Run.S)) }
+  );
 
   it('returns empty list', () => {
     setupRuns(empty);
 
-    return new Reader(ddbStub).getRuns(testId).then(res => assert.deepEqual(res, empty.Items));
+    return new Reader(ddbStub).getRuns([testId]).then((res) => {
+      assert.equal(res.length, 1);
+      return res[0].then(x => assert.deepEqual(x, { runs: [] }));
+    });
   });
 
-  it('returns runs', () => {
+  it('returns runs for one test', () => {
     setupRuns(runs);
 
-    return new Reader(ddbStub).getRuns(testId, runId)
-      .then(res => assert.deepEqual(res, runs.Items.map(item => JSON.parse(item.Run.S))));
+    return new Reader(ddbStub).getRuns([testId]).then((res) => {
+      assert.equal(res.length, 1);
+      return res[0]
+        .then(x => assert.deepEqual(x, mapRuns(runs)));
+    });
+  });
+
+  it('returns runs for multiple tests', () => {
+    const testId2 = '2';
+    setupRuns(runs);
+    setupRuns(run, testId2);
+
+    return new Reader(ddbStub).getRuns([testId, testId2]).then((res) => {
+      assert.equal(res.length, 2);
+      res[0].then(x => assert.deepEqual(x, mapRuns(runs)));
+      return res[1].then(x => assert.deepEqual(x, mapRuns(run)));
+    });
   });
 });
 
@@ -92,10 +113,3 @@ describe('getTests', () => {
       .then(res => assert.deepEqual(res, tests.Items.map(item => JSON.parse(item.Test.S))));
   });
 });
-
-// it.only('test', () => {
-//   // return new Reader().batchGetTests('11e6c424-7df1-bc80-ac7e-f510c61b0a7f')
-//   return new Reader().batchGetRuns('11e6c424-7df1-bc80-ac7e-f510c61b0a7f', '11e6c4b0-7779-1150-913a-0b296f5eb20b')
-//     .then(res => console.log('testRes=' + JSON.stringify(res)))
-//     .catch(err => console.error('testErr=' + err));
-// });

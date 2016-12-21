@@ -2,6 +2,7 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { describe, it } from 'mocha';
 import sinon from 'sinon';
+import DataLoader from 'dataloader';
 import Resolver from '../../src/graphql/resolver';
 import Reader from '../../src/storage/reader';
 import Writer from '../../src/storage/writer';
@@ -12,7 +13,8 @@ const runId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
-const resolver = new Resolver(readerStub, writerStub);
+const runsLoaderStub = sinon.stub(new DataLoader(keys => readerStub.getRuns(keys)));
+const resolver = new Resolver(readerStub, writerStub, runsLoaderStub);
 const expectedRun = { started: '1970-01-01T00:00:00.000Z', results: [], success: true };
 const expectedTest = { id: testId };
 const runNotFound = 'Run not found.';
@@ -40,12 +42,12 @@ describe('getRun', () => {
 });
 
 describe('getLastFailure', () => {
-  beforeEach(() => readerStub.getRuns.reset());
+  beforeEach(() => runsLoaderStub.load.reset());
 
   it('returns last failure', () => {
     const expected = { started: 1, results: [{ success: true }, { success: false }] };
-    readerStub.getRuns.withArgs(testId)
-      .returns(Promise.resolve([{ started: 0, results: [{ success: false }] }, expected]));
+    runsLoaderStub.load.withArgs(testId).returns(
+      Promise.resolve({ runs: [{ started: 0, results: [{ success: false }] }, expected] }));
 
     return resolver.getLastFailure(testId).then(res => (
       expect(res).to.deep.equal({
@@ -57,7 +59,8 @@ describe('getLastFailure', () => {
   });
 
   it('returns null if no failures', () => {
-    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([{ started: 0, results: [] }]));
+    runsLoaderStub.load.withArgs(testId).returns(
+      Promise.resolve({ runs: [{ started: 0, results: [] }] }));
 
     return resolver.getLastFailure(testId).then(res => (
       expect(res).to.equal(null)
@@ -65,7 +68,7 @@ describe('getLastFailure', () => {
   });
 
   it('returns null if no runs', () => {
-    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([]));
+    runsLoaderStub.load.withArgs(testId).returns(Promise.resolve({ runs: [] }));
 
     return resolver.getLastFailure(testId).then(res => (
       expect(res).to.equal(null)
@@ -74,10 +77,11 @@ describe('getLastFailure', () => {
 });
 
 describe('getRuns', () => {
-  beforeEach(() => readerStub.getRuns.reset());
+  beforeEach(() => runsLoaderStub.load.reset());
 
   it('returns runs', () => {
-    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([{ started: 0, results: [] }]));
+    runsLoaderStub.load.withArgs(testId).returns(
+      Promise.resolve({ runs: [{ started: 0, results: [] }] }));
 
     return resolver.getRuns(testId).then(res => (
       expect(res).to.deep.equal([expectedRun])
@@ -85,7 +89,7 @@ describe('getRuns', () => {
   });
 
   it('returns [] if no runs returned', () => {
-    readerStub.getRuns.withArgs(testId).returns(Promise.resolve([]));
+    runsLoaderStub.load.withArgs(testId).returns(Promise.resolve({ runs: [] }));
 
     return resolver.getRuns(testId).then(res => (
       expect(res).to.deep.equal([])
