@@ -37,36 +37,4 @@ functions:
       - schedule: rate(30 minutes)
 
 resources:
-  Resources:
-    TestsTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: TestId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: TestId
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: tests-${env:NODE_ENV}
-    TestRunsTable:
-      Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: TestId
-            AttributeType: S
-          - AttributeName: RunId
-            AttributeType: S
-        KeySchema:
-          - AttributeName: TestId
-            KeyType: HASH
-          - AttributeName: RunId
-            KeyType: RANGE
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: test-runs-${env:NODE_ENV}
+  Resources: ${file(../scripts/resources.yml)}

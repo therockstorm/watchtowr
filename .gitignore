@@ -3,4 +3,5 @@ node_modules
 .serverless
 dist
 schema.graphql
+resources.yml
 .DS_Store

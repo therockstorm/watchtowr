@@ -4,6 +4,6 @@ import { printSchema } from 'graphql'; // eslint-disable-line import/no-extraneo
 import Schema from '../src/graphql/schema';
 
 fs.writeFileSync(
-  path.join(__dirname, '../src/graphql/schema.graphql'),
+  path.join(__dirname, './schema.graphql'),
   printSchema(new Schema()),
 );
