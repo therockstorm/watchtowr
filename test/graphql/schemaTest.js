@@ -33,6 +33,7 @@ const runsSnippet = `
   }`;
 const runQuery = `query { run(testId: "${testId}", id: "${runId}") { ${runsSnippet} } }`;
 const runsQuery = `query { runs(testId: "${testId}") { ${runsSnippet} } }`;
+const variablesQuery = 'query { variables { key value } }';
 const testsSnippet = `
   id
   name
@@ -58,6 +59,10 @@ const testsSnippet = `
   }`;
 const testQuery = `query { test(id: "${testId}") { ${testsSnippet} } }`;
 const testsQuery = `query { tests { ${testsSnippet} } }`;
+const createVariablesMutation = `mutation { createVariables(variables: [{
+  key: "{{Accept}}",
+  value: "application/json"
+}]) { key } }`;
 const createTestMutation = `mutation { createTest(test: {
   name: "My test name"
   request: {
@@ -122,42 +127,58 @@ it('calls getRuns', () => {
   });
 });
 
+it('calls getVariables', () => {
+  resolverStub.getTests.returns([]);
+  return graphql(schema, variablesQuery).then((res) => {
+    if (res.errors) console.log(res.errors.map(e => e.message));
+    return expect(resolverStub.getVariables.called).to.be.true;
+  });
+});
+
 it('calls createTest', () => (
   graphql(schema, createTestMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(res).to.deep.equal({ data: { createTest: null } }) &&
-      expect(resolverStub.createTest.called).to.be.true;
+    expect(resolverStub.createTest.called).to.be.true;
+    return expect(res).to.deep.equal({ data: { createTest: null } });
+  })
+));
+
+it('calls createVariables', () => (
+  graphql(schema, createVariablesMutation).then((res) => {
+    if (res.errors) console.log(res.errors.map(e => e.message));
+    expect(resolverStub.createVariables.called).to.be.true;
+    return expect(res).to.deep.equal({ data: { createVariables: null } });
   })
 ));
 
 it('calls runById', () => (
   graphql(schema, runTestMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(res).to.deep.equal({ data: { runTest: null } }) &&
-      expect(testRunnerStub.runById.calledWith(testId)).to.be.true;
+    expect(testRunnerStub.runById.calledWith(testId)).to.be.true;
+    return expect(res).to.deep.equal({ data: { runTest: null } });
   })
 ));
 
 it('calls updateTest', () => (
   graphql(schema, updateTestMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(res).to.deep.equal({ data: { updateTest: null } }) &&
-      expect(resolverStub.updateTest.called).to.be.true;
+    expect(resolverStub.updateTest.called).to.be.true;
+    return expect(res).to.deep.equal({ data: { updateTest: null } });
   })
 ));
 
 it('calls deleteTest', () => (
   graphql(schema, deleteTestMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(res).to.deep.equal({ data: { deleteTest: null } }) &&
-      expect(resolverStub.deleteTest.calledWith(testId)).to.be.true;
+    expect(resolverStub.deleteTest.calledWith(testId)).to.be.true;
+    return expect(res).to.deep.equal({ data: { deleteTest: null } });
   })
 ));
 
 it('calls deleteRun', () => (
   graphql(schema, deleteRunMutation).then((res) => {
     if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(res).to.deep.equal({ data: { deleteRun: null } }) &&
-      expect(resolverStub.deleteRun.calledWith(testId, runId)).to.be.true;
+    expect(resolverStub.deleteRun.calledWith(testId, runId)).to.be.true;
+    return expect(res).to.deep.equal({ data: { deleteRun: null } });
   })
 ));

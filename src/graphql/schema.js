@@ -18,51 +18,29 @@ export const httpMethodEnum = new GraphQLEnumType({
   name: 'HttpMethod',
   description: 'HTTP request methods.',
   values: {
-    GET: {
-      value: 1,
-    },
-    POST: {
-      value: 2,
-    },
-    PUT: {
-      value: 3,
-    },
-    DELETE: {
-      value: 4,
-    },
-    HEAD: {
-      value: 5,
-    },
-    OPTIONS: {
-      value: 6,
-    },
+    GET: { value: 1 },
+    POST: { value: 2 },
+    PUT: { value: 3 },
+    DELETE: { value: 4 },
+    HEAD: { value: 5 },
+    OPTIONS: { value: 6 },
   },
 });
 export const assertionTargetEnum = new GraphQLEnumType({
   name: 'AssertionTarget',
   description: 'The HTTP response property to run assertions against.',
   values: {
-    STATUS_CODE: {
-      value: 1,
-    },
-    ELAPSED_TIME_MS: {
-      value: 2,
-    },
+    STATUS_CODE: { value: 1 },
+    ELAPSED_TIME_MS: { value: 2 },
   },
 });
 export const comparisonEnum = new GraphQLEnumType({
   name: 'Comparison',
   description: 'Comparisons.',
   values: {
-    EQUAL: {
-      value: 1,
-    },
-    NOT_EQUAL: {
-      value: 2,
-    },
-    LESS_THAN: {
-      value: 3,
-    },
+    EQUAL: { value: 1 },
+    NOT_EQUAL: { value: 2 },
+    LESS_THAN: { value: 3 },
   },
 });
 const assertionType = new GraphQLObjectType({
@@ -95,6 +73,14 @@ const headerType = new GraphQLObjectType({
       type: GraphQLString,
       description: 'The header value.',
     },
+  }),
+});
+const keyValueType = new GraphQLObjectType({
+  name: 'KeyValue',
+  description: 'A key/value pair.',
+  fields: () => ({
+    key: { type: GraphQLString },
+    value: { type: GraphQLString },
   }),
 });
 const requestType = new GraphQLObjectType({
@@ -189,6 +175,14 @@ const headerInputType = new GraphQLInputObjectType({
       type: new GraphQLNonNull(GraphQLString),
       description: 'The header value.',
     },
+  }),
+});
+const keyValueInputType = new GraphQLInputObjectType({
+  name: 'KeyValueInput',
+  description: 'A key/value pair input.',
+  fields: () => ({
+    key: { type: new GraphQLNonNull(GraphQLString) },
+    value: { type: new GraphQLNonNull(GraphQLString) },
   }),
 });
 const requestInputType = new GraphQLInputObjectType({
@@ -349,6 +343,10 @@ export default class Schema extends GraphQLSchema {
             },
             resolve: (root, { testId }) => resolver.getRuns(testId),
           },
+          variables: {
+            type: new GraphQLNonNull(new GraphQLList(keyValueType)),
+            resolve: resolver.getVariables(),
+          },
         }),
       }),
       mutation: new GraphQLObjectType({
@@ -363,6 +361,16 @@ export default class Schema extends GraphQLSchema {
               },
             },
             resolve: (root, { test }) => resolver.createTest(test),
+          },
+          createVariables: {
+            type: new GraphQLList(keyValueType),
+            args: {
+              variables: {
+                description: 'The variables to create.',
+                type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(keyValueInputType))),
+              },
+            },
+            resolve: (root, { variables }) => resolver.createVariables(variables),
           },
           runTest: {
             type: runType,

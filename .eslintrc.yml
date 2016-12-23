@@ -3,7 +3,6 @@ plugins:
   - import
 env:
   es6: true
-  mocha: true
   node: true
 rules:
   no-underscore-dangle: 0

@@ -37,12 +37,20 @@ export default class Resolver {
     return this.writer.createTest(test);
   }
 
+  createVariables(variables) {
+    return variables;
+  }
+
   getTest(testId) {
     return this.reader.getTest(testId).then(Mapper.toApiTest);
   }
 
   getTests() {
     return this.reader.getTests().then(tests => Mapper.toApiTest(tests, true, []));
+  }
+
+  getVariables() {
+    return [{ key: 'myKey', value: 'myValue' }];
   }
 
   updateTest(test) {
