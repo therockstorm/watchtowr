@@ -17,7 +17,6 @@ export default class Resolver {
 
   getLastFailure(testId) {
     return this.runsLoader.load(testId).then((r) => {
-      // console.log(JSON.stringify(r));
       for (let i = r.runs.length - 1; i >= 0; i -= 1) {
         if (!r.runs[i].results.every(result => result.success)) return Mapper.toApiRun([r.runs[i]]);
       }
@@ -25,15 +24,6 @@ export default class Resolver {
     });
   }
 
-// Should return test not found, returns empty list instead
-// query {
-//   runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
-//     elapsedMs
-//     results {
-//       actual
-//     }
-//   }
-// }
   getRuns(testId) {
     return this.runsLoader.load(testId).then(r => Mapper.toApiRun(r.runs, true, []));
   }
@@ -46,10 +36,6 @@ export default class Resolver {
     return this.writer.createTest(test);
   }
 
-  createVariables(variables) {
-    return variables;
-  }
-
   getTest(testId) {
     return this.reader.getTest(testId).then(Mapper.toApiTest);
   }
@@ -58,8 +44,12 @@ export default class Resolver {
     return this.reader.getTests().then(tests => Mapper.toApiTest(tests, true, []));
   }
 
+  createVariables(variables) {
+    return this.writer.createVariables(variables);
+  }
+
   getVariables() {
-    return [{ key: 'myKey', value: 'myValue' }];
+    return this.reader.getVariables().then(variables => Mapper.toApiVariable(variables, true, []));
   }
 
   updateTest(test) {

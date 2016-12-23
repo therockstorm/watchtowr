@@ -6,8 +6,11 @@ import Util from '../../src/util/util';
 import Writer from '../../src/storage/writer';
 
 const ddbStub = sinon.stub(new aws.DynamoDB());
-const testsTable = 'TestsTest';
-const testRunsTable = 'TestRunsTest';
+const s3Stub = sinon.stub(new aws.S3());
+const testsTable = 'Teststest';
+const testRunsTable = 'TestRunstest';
+const variablesBucket = 'watchtowr-test-variables';
+const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 const runId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const testId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const generatedId = '00000000-0000-0000-0000-000000000000';
@@ -19,7 +22,7 @@ const setupPutRun = run => ddbStub.putItem.withArgs({
     Run: { S: JSON.stringify(run) },
   },
   TableName: testRunsTable,
-}).returns({ promise: () => Promise.resolve(run) });
+}).returns({ promise: () => Promise.resolve() });
 
 const setupDeleteRun = ret => ddbStub.deleteItem.withArgs({
   Item: { TestId: { S: testId }, RunId: { S: runId } },
@@ -30,7 +33,14 @@ const setupDeleteRun = ret => ddbStub.deleteItem.withArgs({
 const setupPutTest = test => ddbStub.putItem.withArgs({
   Item: { TestId: { S: test.id }, Test: { S: JSON.stringify(test) } },
   TableName: testsTable,
-}).returns({ promise: () => Promise.resolve(test) });
+}).returns({ promise: () => Promise.resolve() });
+
+const setupPutObject = variables => s3Stub.putObject.withArgs({
+  Bucket: variablesBucket,
+  Key: `${accountId}.json`,
+  Body: JSON.stringify(variables),
+  ServerSideEncryption: 'AES256',
+}).returns({ promise: () => Promise.resolve() });
 
 const setupDeleteTest = ret => ddbStub.deleteItem.withArgs({
   Item: { TestId: { S: testId } },
@@ -67,7 +77,7 @@ describe('writer', () => {
     const test = { id: generatedId, created };
     setupPutTest(test);
 
-    return new Writer(ddbStub, dateStub).createTest({})
+    return new Writer(ddbStub, s3Stub, dateStub).createTest({})
       .then(res => assert.deepEqual(res, test));
   });
 
@@ -84,5 +94,13 @@ describe('writer', () => {
 
     return new Writer(ddbStub).deleteTest(testId)
       .then(res => assert.deepEqual(res, [{ id: testId }]));
+  });
+
+  it('creates variables', () => {
+    const variables = { key: 'myKey', value: 'myValue' };
+    setupPutObject(variables);
+
+    return new Writer(ddbStub, s3Stub).createVariables(variables)
+      .then(res => assert.deepEqual(res, variables));
   });
 });

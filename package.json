@@ -27,7 +27,7 @@
     "logs": "cd src && serverless logs --function ${npm_package_config_function} --stage $NODE_ENV --startTime 1m && cd ..",
     "logs:api": "npm run logs --watchtowr:function=api",
     "logs:runner": "npm run logs --watchtowr:function=runner",
-    "test": "NODE_ENV=Test mocha --require babel-register --recursive test/",
+    "test": "NODE_ENV=test mocha --require babel-register --recursive test/",
     "test:api": "babel-node scripts/apiFunc.js",
     "test:runner": "babel-node scripts/runnerFunc.js",
     "update-schema": "babel-node scripts/updateSchema.js",

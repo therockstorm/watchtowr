@@ -15,6 +15,7 @@ const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const runsLoaderStub = sinon.stub(new DataLoader(keys => readerStub.getRuns(keys)));
 const resolver = new Resolver(readerStub, writerStub, runsLoaderStub);
+const variables = [{ key: 'myKey', value: 'myValue' }];
 const expectedRun = { started: '1970-01-01T00:00:00.000Z', results: [], success: true };
 const expectedTest = { id: testId };
 const runNotFound = 'Run not found.';
@@ -207,6 +208,38 @@ describe('deleteTest', () => {
 
     return resolver.deleteTest(testId).then(res => (
       expect(res.message).to.equal(testNotFound)
+    ));
+  });
+});
+
+describe('createVariables', () => {
+  beforeEach(() => writerStub.createVariables.reset());
+
+  it('returns created variables', () => {
+    writerStub.createVariables.withArgs(variables).returns(Promise.resolve(variables));
+
+    return resolver.createVariables(variables).then(res => (
+      expect(res).to.deep.equal(variables)
+    ));
+  });
+});
+
+describe('getVariables', () => {
+  beforeEach(() => readerStub.getVariables.reset());
+
+  it('returns variables', () => {
+    readerStub.getVariables.returns(Promise.resolve(variables));
+
+    return resolver.getVariables().then(res => (
+      expect(res).to.deep.equal(variables)
+    ));
+  });
+
+  it('returns [] if no variables returned', () => {
+    readerStub.getVariables.returns(Promise.resolve([]));
+
+    return resolver.getVariables().then(res => (
+      expect(res).to.deep.equal([])
     ));
   });
 });

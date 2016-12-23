@@ -10,6 +10,8 @@ it('returns ids in order', () => {
 });
 
 it('Test random stuff here', () => {
-  const val = 'dog';
-  console.log(val);
+  const bytes = s => ~-encodeURI(s).split(/%..|./).length; // eslint-disable-line no-bitwise
+  const jsonSize = s => bytes(JSON.stringify(s));
+
+  console.log(jsonSize({ 'shirt-color': 'R', 'shirt-size': 'M' }));
 });

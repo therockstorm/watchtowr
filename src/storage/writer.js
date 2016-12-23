@@ -1,12 +1,17 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
 
-const testsTable = `Tests${process.env.NODE_ENV}`;
-const testRunsTable = `TestRuns${process.env.NODE_ENV}`;
+const stage = process.env.NODE_ENV;
+const testsTable = `Tests${stage}`;
+const testRunsTable = `TestRuns${stage}`;
+const variablesBucket = `watchtowr-${stage}-variables`;
+const config = { region: 'us-west-2' };
+const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 
 export default class Writer {
-  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' }), date = new Date()) {
+  constructor(ddb = new aws.DynamoDB(config), s3 = new aws.S3(config), date = new Date()) {
     this.ddb = ddb;
+    this.s3 = s3;
     this.date = date;
   }
 
@@ -52,6 +57,15 @@ export default class Writer {
     }).promise().then(data => (
       data.Items.map(item => JSON.parse(item.Test.S))
     )).catch(err => Util.error(err));
+  }
+
+  createVariables(variables) {
+    return this.s3.putObject({
+      Bucket: variablesBucket,
+      Key: `${accountId}.json`,
+      Body: JSON.stringify(variables),
+      ServerSideEncryption: 'AES256',
+    }).promise().then(() => variables).catch(err => Util.error(err));
   }
 
   _putTest(test) {

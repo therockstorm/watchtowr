@@ -1,45 +1,18 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
 
-const testsTable = `Tests${process.env.NODE_ENV}`;
-const testRunsTable = `TestRuns${process.env.NODE_ENV}`;
+const stage = process.env.NODE_ENV;
+const testsTable = `Tests${stage}`;
+const testRunsTable = `TestRuns${stage}`;
+const variablesBucket = `watchtowr-${stage}-variables`;
+const config = { region: 'us-west-2' };
+const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 
 export default class Reader {
-  constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' })) {
+  constructor(ddb = new aws.DynamoDB(config), s3 = new aws.S3(config)) {
     this.ddb = ddb;
+    this.s3 = s3;
   }
-
-  // getRunDoc(testId, runId) {
-  //   const docClient = new aws.DynamoDB.DocumentClient({ region: 'us-west-2' });
-  //   console.log('getRunDoc');
-  //   return docClient
-  //     .query({
-  //       TableName: testRunsTable,
-  //       KeyConditionExpression: 'TestId = :testIdVal AND RunId = :runIdVal',
-  //       ExpressionAttributeValues: { ':testIdVal': testId, ':runIdVal': runId },
-  //     })
-  //     .promise()
-  //     .then(data => data.Items.map(item => JSON.parse(item.Run)))
-  //     .catch(err => Reader._logAndThrow(err));
-  // }
-
-  // batchGetTests(testId) {
-  //   console.log('batchGetTests');
-  //   return this.ddb.batchGetItem({
-  //     RequestItems: { testsTable: { Keys: [{ TestId: { S: testId } }] } },
-  //   }).promise().then(data => (
-  //     data.Responses[testsTable].map(item => JSON.parse(item.Test.S))
-  //   )).catch(err => Reader._logAndThrow(err));
-  // }
-
-  // batchGetRuns(testId, runId) {
-  //   console.log('batchGetRuns');
-  //   return this.ddb.batchGetItem({
-  //  RequestItems: { testRunsTable: { Keys: [{ TestId: { S: testId }, RunId: { S: runId } }] } },
-  //   }).promise().then(data => (
-  //     data.Responses[testRunsTable].map(item => JSON.parse(item.Run.S))
-  //   )).catch(err => Reader._logAndThrow(err));
-  // }
 
   getRun(testId, runId) {
     Util.log(`getRun(${testId}, ${runId})`);
@@ -50,7 +23,7 @@ export default class Reader {
       ProjectionExpression: 'Run',
     }).promise().then(data => (
       data.Items.map(item => JSON.parse(item.Run.S))
-    )).catch(err => Reader._logAndThrow(err));
+    )).catch(err => Reader._logAndCreateErr(err));
   }
 
   getRuns(testIds) {
@@ -61,8 +34,7 @@ export default class Reader {
         KeyConditionExpression: 'TestId = :testIdVal',
         ExpressionAttributeValues: { ':testIdVal': { S: testId } },
         ProjectionExpression: 'Run',
-      })
-      .promise()
+      }).promise()
       .then(data => ({ runs: data.Items.map(item => JSON.parse(item.Run.S)) }))
       .catch(err => Reader._logAndCreateErr(err)))));
   }
@@ -76,23 +48,25 @@ export default class Reader {
       ProjectionExpression: 'Test',
     }).promise().then(data => (
       data.Items.map(item => JSON.parse(item.Test.S))
-    )).catch(err => Reader._logAndThrow(err));
+    )).catch(err => Reader._logAndCreateErr(err));
   }
 
   getTests() {
     Util.log('getTests()');
-    return this.ddb.scan({ TableName: testsTable }).promise().then(data => (
-      data.Items.map(item => JSON.parse(item.Test.S))
-    )).catch(err => Reader._logAndThrow(err));
+    return this.ddb.scan({ TableName: testsTable }).promise()
+      .then(data => (data.Items.map(item => JSON.parse(item.Test.S))))
+      .catch(err => Reader._logAndCreateErr(err));
+  }
+
+  getVariables() {
+    Util.log('getVariables()');
+    return this.s3.getObject({ Bucket: variablesBucket, Key: `${accountId}.json` }).promise()
+      .then(data => JSON.parse(data.Body.toString()))
+      .catch(err => (err.code === 'NoSuchKey' ? [] : Reader._logAndCreateErr(err)));
   }
 
   static _logAndCreateErr(err) {
     Util.error(err);
     return new Error('Server error occurred and we have been notified.');
-  }
-
-  static _logAndThrow(err) {
-    Util.error(err);
-    throw new Error('Server error occurred and we have been notified.');
   }
 }

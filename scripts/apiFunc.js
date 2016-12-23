@@ -1,3 +1,4 @@
+/* eslint-disable */
 import { handle } from '../src/api';
 
 const queries = [
@@ -8,27 +9,27 @@ const queries = [
   // non-existent test(id: UUID!)
   // 'query { test(id: "11e6af50-8fbf-b952-80db-218d3d616683") { id name request { method url headers { key value } body } assertions { target comparison value } runs { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } } }',
   // test(id: UUID!)
-  `query {
-    test(id: "11e6c73c-9002-da10-b145-35b599cc3f91") {
-      lastFailure {
-        started
-      }
-      runs {
-        started
-      }
-    }
-    runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
-      started
-    }
-  }`,
   // `query {
-  //   runs1: runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
-  //     elapsedMs
+  //   test(id: "11e6c73c-9002-da10-b145-35b599cc3f91") {
+  //     lastFailure {
+  //       started
+  //     }
+  //     runs {
+  //       started
+  //     }
   //   }
-  //   runs2: runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
-  //     elapsedMs
+  //   runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
+  //     started
   //   }
   // }`,
+  `query {
+    runs1: runs(testId: "11e6c424-7df1-bc80-ac7e-f510c61b0a7f") {
+      elapsedMs
+    }
+    runs2: runs(testId: "11e6c967-3605-99d0-89a5-87a8257a07e5") {
+      elapsedMs
+    }
+  }`,
   // non-existent test runs(testId: UUID!)
   // 'query { runs(testId: "11e6af50-8fbf-b952-80db-218d3d616683") { id started elapsedMs response { statusCode } results { expected { target comparison value } actual success } success } }',
   // runs(testId: UUID!)
@@ -78,10 +79,10 @@ const mutations = [
 }`,
 ];
 
-queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
-  if (err) console.log(`err=${JSON.stringify(err)}`);
-  if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
-})));
+// queries.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
+//   if (err) console.log(`err=${JSON.stringify(err)}`);
+//   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
+// })));
 
 // const q = 'query GetTest($id: UUID!) { test(id: $id) { runs { started } } }';
 // const v = '{ "id": "11e6c424-7df1-bc80-ac7e-f510c61b0a7f" }';

@@ -30,7 +30,7 @@ const dynamoTable = (tableName, attributeDefinitions, keySchema) => ({
 });
 
 const cloudWatchAlarm = (metric, namespace, statistic, evalPeriods,
-    threshold, comparison, dimName, dimValue) =>
+    threshold, comparison, dimName, dimValueRef) =>
   ({
     Type: 'AWS::CloudWatch::Alarm',
     Properties: {
@@ -42,25 +42,68 @@ const cloudWatchAlarm = (metric, namespace, statistic, evalPeriods,
       EvaluationPeriods: evalPeriods,
       Threshold: threshold,
       ComparisonOperator: comparison,
-      Dimensions: [{ Name: dimName, Value: { Ref: dimValue } }],
+      Dimensions: [{ Name: dimName, Value: { Ref: dimValueRef } }],
     },
   });
 
-const cloudWatchFunctionAlarm = dimValue => cloudWatchAlarm('Errors', 'AWS/Lambda', 'Average', '1', '0', 'GreaterThanThreshold', 'FunctionName', dimValue);
+const cloudWatchFunctionAlarm = dimValueRef => cloudWatchAlarm('Errors', 'AWS/Lambda', 'Average', '1', '0', 'GreaterThanThreshold', 'FunctionName', dimValueRef);
 
-const cloudWatchDynamoAlarm = (metric, dimValue) => cloudWatchAlarm(metric, 'AWS/DynamoDB', 'Sum', '5', '48', 'GreaterThanOrEqualToThreshold', 'TableName', dimValue);
+const cloudWatchDynamoAlarm = (metric, dimValueRef) => cloudWatchAlarm(metric, 'AWS/DynamoDB', 'Sum', '5', '48', 'GreaterThanOrEqualToThreshold', 'TableName', dimValueRef);
 
+const s3Bucket = name => ({
+  Type: 'AWS::S3::Bucket',
+  DeletionPolicy: 'Retain',
+  Properties: {
+    BucketName: `${service}-${stage}-${name}`,
+  },
+});
+
+const bucketResource = bucketRef => [{ 'Fn::Join': ['', ['arn:aws:s3:::', { Ref: bucketRef }, '/*']] }];
+
+const s3BucketPolicy = bucketRef => ({
+  Type: 'AWS::S3::BucketPolicy',
+  Properties: {
+    Bucket: { Ref: bucketRef },
+    PolicyDocument: {
+      Statement: [{
+        Effect: 'Allow',
+        Principal: '*',
+        Action: ['s3:GetObject', 's3:PutObject'],
+        Resource: bucketResource(bucketRef),
+      }, {
+        Sid: 'DenyIncorrectEncryptionHeader',
+        Effect: 'Deny',
+        Principal: '*',
+        Action: 's3:PutObject',
+        Resource: bucketResource(bucketRef),
+        Condition: { StringNotEquals: { 's3:x-amz-server-side-encryption': 'AES256' } },
+      }, {
+        Sid: 'DenyUnEncryptedObjectUploads',
+        Effect: 'Deny',
+        Principal: '*',
+        Action: 's3:PutObject',
+        Resource: bucketResource(bucketRef),
+        Condition: { Null: { 's3:x-amz-server-side-encryption': 'true' } },
+      }],
+    },
+  },
+});
+
+const testsTableRef = 'TestsTable';
+const testRunsTableRef = 'TestRunsTable';
 fs.writeFileSync(
   path.join(__dirname, './resources.yml'),
   yaml.safeDump({
     EmailSnsTopic: snsTopic(),
     TestsTable: dynamoTable(`Tests${stage}`, [attributeDef('TestId', 'S')], [keyDef('TestId', 'HASH')]),
     TestRunsTable: dynamoTable(`TestRuns${stage}`, [attributeDef('TestId', 'S'), attributeDef('RunId', 'S')], [keyDef('TestId', 'HASH'), keyDef('RunId', 'RANGE')]),
-    TestsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', 'TestsTable'),
-    TestsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', 'TestsTable'),
-    TestRunsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', 'TestRunsTable'),
-    TestRunsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', 'TestRunsTable'),
+    TestsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', testsTableRef),
+    TestsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', testsTableRef),
+    TestRunsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', testRunsTableRef),
+    TestRunsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', testRunsTableRef),
     ApiErrorAlarm: cloudWatchFunctionAlarm('ApiLambdaFunction'),
     RunnerErrorAlarm: cloudWatchFunctionAlarm('RunnerLambdaFunction'),
+    VariablesS3Bucket: s3Bucket('variables'),
+    VariablesS3BucketPolicy: s3BucketPolicy('VariablesS3Bucket'),
   }),
 );

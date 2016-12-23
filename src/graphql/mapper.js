@@ -11,7 +11,15 @@ export default class Mapper {
   }
 
   static toApiTest(tests, isList = false, error = new Error('Test not found.')) {
-    if (!tests || !tests.length) return error;
-    return isList ? tests : tests[0];
+    return Mapper.toApi(tests, isList, error);
+  }
+
+  static toApiVariable(variables, isList = false, error = new Error('Variable not found.')) {
+    return Mapper.toApi(variables, isList, error);
+  }
+
+  static toApi(obj, isList = false, error = new Error('Not found.')) {
+    if (!obj || !obj.length) return error;
+    return isList ? obj : obj[0];
   }
 }

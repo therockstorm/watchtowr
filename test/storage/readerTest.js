@@ -5,6 +5,9 @@ import sinon from 'sinon';
 import Reader from '../../src/storage/reader';
 
 const ddbStub = sinon.stub(new aws.DynamoDB());
+const s3Stub = sinon.stub(new aws.S3());
+const variablesBucket = 'watchtowr-test-variables';
+const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 const runId = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const testId = '11e6af50-8fbf-b952-80db-218d3d616683';
 const empty = { Items: [] };
@@ -23,7 +26,7 @@ const setupQuery = (ret, table, key, exp, proj) => ddbStub.query.withArgs({
 }).returns({ promise: () => Promise.resolve(ret) });
 
 describe('getRun', () => {
-  const setupRun = ret => setupQuery(ret, 'TestRunsTest', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
+  const setupRun = ret => setupQuery(ret, 'TestRunstest', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
 
   it('returns empty list', () => {
     setupRun(empty);
@@ -41,10 +44,8 @@ describe('getRun', () => {
 });
 
 describe('getRuns', () => {
-  const setupRuns = (ret, id = testId) => setupQuery(ret, 'TestRunsTest', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
-  const mapRuns = val => (
-    { runs: val.Items.map(item => JSON.parse(item.Run.S)) }
-  );
+  const setupRuns = (ret, id = testId) => setupQuery(ret, 'TestRunstest', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
+  const mapRuns = val => ({ runs: val.Items.map(item => JSON.parse(item.Run.S)) });
 
   it('returns empty list', () => {
     setupRuns(empty);
@@ -79,7 +80,7 @@ describe('getRuns', () => {
 });
 
 describe('getTest', () => {
-  const setupTest = ret => setupQuery(ret, 'tests-test', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
+  const setupTest = ret => setupQuery(ret, 'Teststest', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
 
   it('returns empty list', () => {
     setupTest(empty);
@@ -97,7 +98,7 @@ describe('getTest', () => {
 });
 
 describe('getTests', () => {
-  const setupScan = ret => ddbStub.scan.withArgs({ TableName: 'tests-test' })
+  const setupScan = ret => ddbStub.scan.withArgs({ TableName: 'Teststest' })
     .returns({ promise: () => Promise.resolve(ret) });
 
   it('returns empty list', () => {
@@ -111,5 +112,24 @@ describe('getTests', () => {
 
     return new Reader(ddbStub).getTests()
       .then(res => assert.deepEqual(res, tests.Items.map(item => JSON.parse(item.Test.S))));
+  });
+});
+
+describe('getVariables', () => {
+  const setupGetObject = () => s3Stub.getObject.withArgs({ Bucket: variablesBucket, Key: `${accountId}.json` });
+
+  it('returns empty list', () => {
+    setupGetObject().returns({ promise: () => Promise.reject({ code: 'NoSuchKey' }) });
+
+    return new Reader(ddbStub, s3Stub).getVariables().then(res => assert.deepEqual(res, []));
+  });
+
+  it('returns tests', () => {
+    const variables = [{ key: 'myKey', value: 'myValue' }];
+    setupGetObject()
+      .returns({ promise: () => Promise.resolve({ Body: JSON.stringify(variables) }) });
+
+    return new Reader(ddbStub, s3Stub).getVariables()
+      .then(res => assert.deepEqual(res, variables));
   });
 });
