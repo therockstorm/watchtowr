@@ -14,7 +14,7 @@
     "region": "us-west-2"
   },
   "scripts": {
-    "build": "nr build:resources && nr build:services",
+    "build": "npm run build:resources && npm run build:services",
     "build:resources": "babel-node scripts/generateResources.js ${npm_package_name}",
     "build:services": "mkdir dist && cp src/serverless.yml dist && cp src/package.json dist && cd dist && yarn && snyk test && snyk monitor && cd .. && babel --out-dir=dist ./src",
     "cert:deploy": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_region} ${npm_package_config_apiId}",
@@ -27,7 +27,7 @@
     "logs": "cd src && serverless logs --function ${npm_package_config_function} --stage $NODE_ENV --startTime 1m && cd ..",
     "logs:api": "npm run logs --watchtowr:function=api",
     "logs:runner": "npm run logs --watchtowr:function=runner",
-    "test": "NODE_ENV=test mocha --require babel-register --recursive test/",
+    "test": "NODE_ENV=Test mocha --require babel-register --recursive test/",
     "test:api": "babel-node scripts/apiFunc.js",
     "test:runner": "babel-node scripts/runnerFunc.js",
     "update-schema": "babel-node scripts/updateSchema.js",

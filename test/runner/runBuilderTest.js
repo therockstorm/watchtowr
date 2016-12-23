@@ -9,11 +9,11 @@ const elapsed = 654.321;
 const response = { status: 200 };
 let assertions = [];
 
-function createRunBuilder() {
+const createRunBuilder = () => {
   const rb = new RunBuilder();
   rb.create(startedTime, startedHighRes, assertions, response);
   return rb;
-}
+};
 
 describe('RunBuilder', () => {
   beforeEach(() => {
@@ -45,7 +45,7 @@ describe('RunBuilder', () => {
       });
     });
 
-    function setAssertions(target, actual, other) {
+    const setAssertions = (target, actual, other) => {
       assertions = [
         { target, comparison: 1, value: actual },
         { target, comparison: 1, value: other },
@@ -55,9 +55,9 @@ describe('RunBuilder', () => {
         { target, comparison: 3, value: other },
         { target, comparison: 99, value: other },
       ];
-    }
+    };
 
-    function assertResult(result, actual) {
+    const assertResult = (result, actual) => {
       assert.deepEqual(result, {
         started: startedTime,
         elapsedMs: elapsed,
@@ -72,7 +72,7 @@ describe('RunBuilder', () => {
           { expected: assertions[6], actual: actual.toString(), success: false },
         ],
       });
-    }
+    };
 
     it('asserts STATUS_CODE target', () => {
       const actual = response.status;

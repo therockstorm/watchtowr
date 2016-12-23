@@ -1,8 +1,8 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
 
-const testsTable = `tests-${process.env.NODE_ENV}`;
-const testRunsTable = `test-runs-${process.env.NODE_ENV}`;
+const testsTable = `Tests${process.env.NODE_ENV}`;
+const testRunsTable = `TestRuns${process.env.NODE_ENV}`;
 
 export default class Writer {
   constructor(ddb = new aws.DynamoDB({ region: 'us-west-2' }), date = new Date()) {

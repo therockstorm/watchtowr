@@ -61,20 +61,6 @@ const assertionType = new GraphQLObjectType({
     },
   }),
 });
-const headerType = new GraphQLObjectType({
-  name: 'Header',
-  description: 'An HTTP header.',
-  fields: () => ({
-    key: {
-      type: GraphQLString,
-      description: 'The header key.',
-    },
-    value: {
-      type: GraphQLString,
-      description: 'The header value.',
-    },
-  }),
-});
 const keyValueType = new GraphQLObjectType({
   name: 'KeyValue',
   description: 'A key/value pair.',
@@ -96,7 +82,7 @@ const requestType = new GraphQLObjectType({
       description: 'The URL of the request.',
     },
     headers: {
-      type: new GraphQLList(headerType),
+      type: new GraphQLList(keyValueType),
       description: 'A list of headers for the request.',
     },
     body: {
@@ -163,20 +149,6 @@ const runType = new GraphQLObjectType({
     },
   }),
 });
-const headerInputType = new GraphQLInputObjectType({
-  name: 'HeaderInput',
-  description: 'An HTTP header input.',
-  fields: () => ({
-    key: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'The header key.',
-    },
-    value: {
-      type: new GraphQLNonNull(GraphQLString),
-      description: 'The header value.',
-    },
-  }),
-});
 const keyValueInputType = new GraphQLInputObjectType({
   name: 'KeyValueInput',
   description: 'A key/value pair input.',
@@ -198,7 +170,7 @@ const requestInputType = new GraphQLInputObjectType({
       description: 'The URL of the request.',
     },
     headers: {
-      type: new GraphQLList(headerInputType),
+      type: new GraphQLList(keyValueInputType),
       description: 'A list of headers for the request.',
     },
     body: {
@@ -345,7 +317,7 @@ export default class Schema extends GraphQLSchema {
           },
           variables: {
             type: new GraphQLNonNull(new GraphQLList(keyValueType)),
-            resolve: resolver.getVariables(),
+            resolve: () => resolver.getVariables(),
           },
         }),
       }),
@@ -418,7 +390,23 @@ export default class Schema extends GraphQLSchema {
           },
         }),
       }),
-      types: [assertionType, headerType, requestType, responseType, resultType, runType, testType],
+      types: [
+        httpMethodEnum,
+        assertionTargetEnum,
+        comparisonEnum,
+        assertionType,
+        keyValueType,
+        requestType,
+        responseType,
+        resultType,
+        runType,
+        testType,
+        keyValueInputType,
+        requestInputType,
+        assertionInputType,
+        testInputType,
+        testUpdateInputType,
+      ],
     });
   }
 }

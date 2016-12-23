@@ -25,6 +25,15 @@ export default class Resolver {
     });
   }
 
+// Should return test not found, returns empty list instead
+// query {
+//   runs(testId: "11e6c73c-9002-da10-b145-35b599cc3f91") {
+//     elapsedMs
+//     results {
+//       actual
+//     }
+//   }
+// }
   getRuns(testId) {
     return this.runsLoader.load(testId).then(r => Mapper.toApiRun(r.runs, true, []));
   }

@@ -23,7 +23,7 @@ const setupQuery = (ret, table, key, exp, proj) => ddbStub.query.withArgs({
 }).returns({ promise: () => Promise.resolve(ret) });
 
 describe('getRun', () => {
-  const setupRun = ret => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
+  const setupRun = ret => setupQuery(ret, 'TestRunsTest', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
 
   it('returns empty list', () => {
     setupRun(empty);
@@ -41,7 +41,7 @@ describe('getRun', () => {
 });
 
 describe('getRuns', () => {
-  const setupRuns = (ret, id = testId) => setupQuery(ret, 'test-runs-test', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
+  const setupRuns = (ret, id = testId) => setupQuery(ret, 'TestRunsTest', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
   const mapRuns = val => (
     { runs: val.Items.map(item => JSON.parse(item.Run.S)) }
   );

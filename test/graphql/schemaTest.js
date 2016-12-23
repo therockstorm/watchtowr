@@ -1,5 +1,4 @@
-import chai from 'chai';
-import chaiAsPromised from 'chai-as-promised';
+import { assert } from 'chai';
 import { it } from 'mocha';
 import sinon from 'sinon';
 import { graphql } from 'graphql';
@@ -7,8 +6,6 @@ import Schema from '../../src/graphql/schema';
 import Resolver from '../../src/graphql/resolver';
 import TestRunner from '../../src/runner/testRunner';
 
-chai.use(chaiAsPromised);
-const expect = chai.expect;
 const resolverStub = sinon.stub(new Resolver());
 const testRunnerStub = sinon.stub(new TestRunner());
 const schema = new Schema(resolverStub, testRunnerStub);
@@ -97,88 +94,94 @@ const updateTestMutation = `mutation { updateTest(test: {
 const deleteTestMutation = `mutation { deleteTest(id: "${testId}") { id } }`;
 const deleteRunMutation = `mutation { deleteRun(testId: "${testId}", id: "${runId}") { id } }`;
 
+const failOnErrors = (res) => {
+  if (!res.errors) return;
+  console.log(res.errors.map(e => e.message));
+  assert.isTrue(false);
+};
+
 it('calls getTest', () => (
   graphql(schema, testQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getTest.calledWith(testId)).to.be.true;
+    failOnErrors(res);
+    return assert.isTrue(resolverStub.getTest.calledWith(testId));
   })
 ));
 
 it('calls getTests', () => {
   resolverStub.getTests.returns([]);
   return graphql(schema, testsQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getTests.called).to.be.true;
+    failOnErrors(res);
+    return assert.isTrue(resolverStub.getTests.called);
   });
 });
 
 it('calls getRun', () => (
   graphql(schema, runQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getRun.calledWith(testId, runId)).to.be.true;
+    failOnErrors(res);
+    return assert.isTrue(resolverStub.getRun.calledWith(testId, runId));
   })
 ));
 
 it('calls getRuns', () => {
   resolverStub.getRuns.returns([]);
   return graphql(schema, runsQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getRuns.calledWith(testId)).to.be.true;
+    failOnErrors(res);
+    return assert.isTrue(resolverStub.getRuns.calledWith(testId));
   });
 });
 
 it('calls getVariables', () => {
-  resolverStub.getTests.returns([]);
+  resolverStub.getVariables.returns([]);
   return graphql(schema, variablesQuery).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    return expect(resolverStub.getVariables.called).to.be.true;
+    failOnErrors(res);
+    return assert.isTrue(resolverStub.getVariables.called);
   });
 });
 
 it('calls createTest', () => (
   graphql(schema, createTestMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(resolverStub.createTest.called).to.be.true;
-    return expect(res).to.deep.equal({ data: { createTest: null } });
+    failOnErrors(res);
+    assert.isTrue(resolverStub.createTest.called);
+    return assert.deepEqual(res, { data: { createTest: null } });
   })
 ));
 
 it('calls createVariables', () => (
   graphql(schema, createVariablesMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(resolverStub.createVariables.called).to.be.true;
-    return expect(res).to.deep.equal({ data: { createVariables: null } });
+    failOnErrors(res);
+    assert.isTrue(resolverStub.createVariables.called);
+    return assert.deepEqual(res, { data: { createVariables: null } });
   })
 ));
 
 it('calls runById', () => (
   graphql(schema, runTestMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(testRunnerStub.runById.calledWith(testId)).to.be.true;
-    return expect(res).to.deep.equal({ data: { runTest: null } });
+    failOnErrors(res);
+    assert.isTrue(testRunnerStub.runById.calledWith(testId));
+    return assert.deepEqual(res, { data: { runTest: null } });
   })
 ));
 
 it('calls updateTest', () => (
   graphql(schema, updateTestMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(resolverStub.updateTest.called).to.be.true;
-    return expect(res).to.deep.equal({ data: { updateTest: null } });
+    failOnErrors(res);
+    assert.isTrue(resolverStub.updateTest.called);
+    return assert.deepEqual(res, { data: { updateTest: null } });
   })
 ));
 
 it('calls deleteTest', () => (
   graphql(schema, deleteTestMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(resolverStub.deleteTest.calledWith(testId)).to.be.true;
-    return expect(res).to.deep.equal({ data: { deleteTest: null } });
+    failOnErrors(res);
+    assert.isTrue(resolverStub.deleteTest.calledWith(testId));
+    return assert.deepEqual(res, { data: { deleteTest: null } });
   })
 ));
 
 it('calls deleteRun', () => (
   graphql(schema, deleteRunMutation).then((res) => {
-    if (res.errors) console.log(res.errors.map(e => e.message));
-    expect(resolverStub.deleteRun.calledWith(testId, runId)).to.be.true;
-    return expect(res).to.deep.equal({ data: { deleteRun: null } });
+    failOnErrors(res);
+    assert.isTrue(resolverStub.deleteRun.calledWith(testId, runId));
+    return assert.deepEqual(res, { data: { deleteRun: null } });
   })
 ));

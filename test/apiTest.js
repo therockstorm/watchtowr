@@ -8,21 +8,16 @@ chai.use(chaiAsPromised);
 const expect = chai.expect;
 const context = { awsRequestId: 'ad32vn' };
 
-function response(body) {
-  return {
-    statusCode: 200,
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'X-Request-Id': context.awsRequestId,
-    },
-    body,
-  };
-}
-
-function error(msg) {
-  return response(`{"errors":[{"message":"${msg}"}]}`);
-}
+const response = body => ({
+  statusCode: 200,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Origin': '*',
+    'X-Request-Id': context.awsRequestId,
+  },
+  body,
+});
+const error = msg => response(`{"errors":[{"message":"${msg}"}]}`);
 
 it('returns error no body', () => (
   handle({}, context, ((err, res) => (

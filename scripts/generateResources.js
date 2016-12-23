@@ -54,8 +54,8 @@ fs.writeFileSync(
   path.join(__dirname, './resources.yml'),
   yaml.safeDump({
     EmailSnsTopic: snsTopic(),
-    TestsTable: dynamoTable(`tests-${stage}`, [attributeDef('TestId', 'S')], [keyDef('TestId', 'HASH')]),
-    TestRunsTable: dynamoTable(`test-runs-${stage}`, [attributeDef('TestId', 'S'), attributeDef('RunId', 'S')], [keyDef('TestId', 'HASH'), keyDef('RunId', 'RANGE')]),
+    TestsTable: dynamoTable(`Tests${stage}`, [attributeDef('TestId', 'S')], [keyDef('TestId', 'HASH')]),
+    TestRunsTable: dynamoTable(`TestRuns${stage}`, [attributeDef('TestId', 'S'), attributeDef('RunId', 'S')], [keyDef('TestId', 'HASH'), keyDef('RunId', 'RANGE')]),
     TestsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', 'TestsTable'),
     TestsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', 'TestsTable'),
     TestRunsTableReadCapacityAlarm: cloudWatchDynamoAlarm('ConsumedReadCapacityUnits', 'TestRunsTable'),
