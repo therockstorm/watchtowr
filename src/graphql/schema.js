@@ -153,8 +153,8 @@ const keyValueInputType = new GraphQLInputObjectType({
   name: 'KeyValueInput',
   description: 'A key/value pair input.',
   fields: () => ({
-    key: { type: new GraphQLNonNull(GraphQLString) },
-    value: { type: new GraphQLLimitedString(1, 50) },
+    key: { type: new GraphQLLimitedString(1, 100) },
+    value: { type: new GraphQLNonNull(GraphQLString) },
   }),
 });
 const requestInputType = new GraphQLInputObjectType({

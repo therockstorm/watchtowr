@@ -20,7 +20,6 @@ const start = [1, 2000000];
 const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId2 = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const variables = [{ key: '{{myKey}}', value: 'myValue' }];
-readerStub.getVariables.returns(variables);
 const test = {
   id: testId1,
   request: {
@@ -70,6 +69,7 @@ describe('TestRunner', () => {
     const result1 = { success: true };
     const result2 = { success: false };
     readerStub.getTests.returns(Promise.resolve(tests));
+    readerStub.getVariables.returns(Promise.resolve(variables));
     requestStub.withArgs({
       url: 'https://myValue.com/get',
       method: 'GET',
@@ -102,8 +102,9 @@ describe('TestRunner', () => {
     const res = { status: 200 };
     const result = { success: true };
     readerStub.getTest.withArgs(testId1).returns(Promise.resolve([test]));
+    readerStub.getVariables.returns(Promise.resolve(variables));
     requestStub.withArgs({
-      url: test.request.url,
+      url: 'https://myValue.com/get',
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: test.request.body,

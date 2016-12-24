@@ -1,6 +1,9 @@
 /* eslint-disable */
 import { handle } from '../src/api';
 
+// import Reader from '../src/storage/reader';
+// new Reader().getVariables().then(res => console.log(res));
+
 const queries = [
   // invalid query
   // 'query { cow { id } }',
@@ -72,6 +75,17 @@ const mutations = [
   //     value: "200"
   //   }]
   // }) { id }}`,
+  // `mutation {
+  //   createVariables(variables: [
+  //     { key: "Accept", value: "application/vnd.dwolla.v1.hal+json" },
+  //     { key: "Content-Type", value: "application/vnd.dwolla.v1.hal+json" },
+  //     { key: "Authorization", value: "Bearer  },
+  //     { key: "BaseUrl", value: "https://api-uat.dwolla.com" }
+  //   ]) {
+  //     key
+  //     value
+  //   }
+  // }`
   `mutation {
     deleteTest(id: "11e6c986-ed2a-6cc0-92dc-075703de9954") {
       id
@@ -79,10 +93,10 @@ const mutations = [
 }`,
 ];
 
-mutations.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
-  if (err) console.log(`err=${JSON.stringify(err)}`);
-  if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
-})));
+// mutations.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
+//   if (err) console.log(`err=${JSON.stringify(err)}`);
+//   if (res) console.log(`statusCode=${res.statusCode}, body=${res.body}`);
+// })));
 
 // const q = 'query GetTest($id: UUID!) { test(id: $id) { runs { started } } }';
 // const v = '{ "id": "11e6c424-7df1-bc80-ac7e-f510c61b0a7f" }';

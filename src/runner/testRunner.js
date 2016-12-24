@@ -18,14 +18,14 @@ export default class TestRunner {
   }
 
   runAll() {
-    const variables = this._getVariables();
-    return this.reader.getTests()
+    return this._getVariables().then(variables => this.reader.getTests()
       .then(tests => tests.map(test => () => this._run(test, variables))
-        .reduce((curr, next) => curr.then(next), Promise.resolve()));
+        .reduce((curr, next) => curr.then(next), Promise.resolve())));
   }
 
   runById(testId) {
-    return this.reader.getTest(testId).then(test => this._run(test[0], this._getVariables()));
+    return this._getVariables().then(variables => this.reader.getTest(testId)
+      .then(test => this._run(test[0], variables)));
   }
 
   _run(test, variables) {
@@ -34,13 +34,15 @@ export default class TestRunner {
       const startedHighRes = process.hrtime();
       const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
       const body = test.request.body;
-      return axios.request({
+      const r = {
         url: Util.replaceAll(test.request.url, variables),
         method: method.value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: body ? Util.replaceAll(body, variables) : body,
         timeout: 90000,
-      }).then((res) => {
+      };
+      // console.log(r);
+      return axios.request(r).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();
         this.notifier.notify(test, run);
@@ -54,9 +56,11 @@ export default class TestRunner {
   }
 
   _getVariables() {
-    const variables = {};
-    this.reader.getVariables().map(variable => (variables[variable.key] = variable.value));
-    return variables;
+    return Promise.resolve(this.reader.getVariables().then((vars) => {
+      const variables = {};
+      vars.map(v => (variables[v.key] = v.value));
+      return variables;
+    }));
   }
 
   static _mapHeaders(testHeaders, variables) {
