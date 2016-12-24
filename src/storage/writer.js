@@ -25,7 +25,7 @@ export default class Writer {
         Run: { S: JSON.stringify(runCopy) },
       },
       TableName: testRunsTable,
-    }).promise().then(() => runCopy).catch(err => Util.error(err));
+    }).promise().then(() => runCopy).catch(err => Writer._logAndCreateErr(err));
   }
 
   deleteRun(testId, runId) {
@@ -35,7 +35,7 @@ export default class Writer {
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
       data.Attributes ? [JSON.parse(data.Attributes.Run.S)] : []
-    )).catch(err => Util.error(err));
+    )).catch(err => Writer._logAndCreateErr(err));
   }
 
   createTest(test) {
@@ -56,7 +56,7 @@ export default class Writer {
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
       data.Attributes ? [JSON.parse(data.Attributes.Test.S)] : []
-    )).catch(err => Util.error(err));
+    )).catch(err => Writer._logAndCreateErr(err));
   }
 
   createVariables(variables) {
@@ -65,13 +65,18 @@ export default class Writer {
       Key: `${accountId}.json`,
       Body: JSON.stringify(variables),
       ServerSideEncryption: 'AES256',
-    }).promise().then(() => variables).catch(err => Util.error(err));
+    }).promise().then(() => variables).catch(err => Writer._logAndCreateErr(err));
   }
 
   _putTest(test) {
     return this.ddb.putItem({
       Item: { TestId: { S: test.id }, Test: { S: JSON.stringify(test) } },
       TableName: testsTable,
-    }).promise().then(() => test).catch(err => Util.error(err));
+    }).promise().then(() => test).catch(err => Writer._logAndCreateErr(err));
+  }
+
+  static _logAndCreateErr(err) {
+    Util.error(err);
+    return new Error('Server error occurred and we have been notified.');
   }
 }

@@ -45,7 +45,11 @@ export default class TestRunner {
         const run = this.runBuilder.build();
         this.notifier.notify(test, run);
         resolve(this.writer.createRun(test.id, run));
-      }).catch(err => reject(err));
+      }).catch((err) => {
+        // createRun failure
+        Util.error(err);
+        return reject(err);
+      });
     });
   }
 
