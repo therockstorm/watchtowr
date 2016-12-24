@@ -4,6 +4,7 @@ import RunBuilder from './runBuilder';
 import Reader from '../storage/reader';
 import Writer from '../storage/writer';
 import Notifier from './notifier';
+import Util from '../util/util';
 import { httpMethodEnum } from '../graphql/schema';
 
 export default class TestRunner {
@@ -17,14 +18,15 @@ export default class TestRunner {
   }
 
   runAll() {
-    return this.reader.getTests().then(tests => tests.map(test => this._run(test)));
+    return this.reader.getTests()
+      .then(tests => tests.map(test => this._run(test, this._getVariables())));
   }
 
   runById(testId) {
-    return this.reader.getTest(testId).then(test => this._run(test[0]));
+    return this.reader.getTest(testId).then(test => this._run(test[0], this._getVariables()));
   }
 
-  _run(test) {
+  _run(test, variables) {
     return new Promise((resolve, reject) => {
       const started = this.date.getTime();
       const startedHighRes = process.hrtime();
@@ -32,7 +34,7 @@ export default class TestRunner {
       return axios.request({
         url: test.request.url,
         method: method.value,
-        headers: TestRunner._mapHeaders(test.request.headers),
+        headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: test.request.body,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
@@ -43,9 +45,17 @@ export default class TestRunner {
     });
   }
 
-  static _mapHeaders(testHeaders) {
+  _getVariables() {
+    const variables = {};
+    this.reader.getVariables().map(variable => (variables[variable.key] = variable.value));
+    return variables;
+  }
+
+  static _mapHeaders(testHeaders, variables) {
     const headers = { 'User-Agent': 'watchtowr/1.0' };
-    if (testHeaders) testHeaders.map(header => (headers[header.key] = header.value));
+    if (testHeaders) {
+      testHeaders.map(header => (headers[header.key] = Util.replaceAll(header.value, variables)));
+    }
     return headers;
   }
 }
