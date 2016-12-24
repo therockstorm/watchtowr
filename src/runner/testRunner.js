@@ -18,14 +18,18 @@ export default class TestRunner {
   }
 
   runAll() {
-    return this._getVariables().then(variables => this.reader.getTests()
-      .then(tests => tests.map(test => () => this._run(test, variables))
-        .reduce((curr, next) => curr.then(next), Promise.resolve())));
+    return this.reader.getTests().then(tests => (
+      tests.length ? this._getVariables()
+      .then(variables => tests.map(test => () => this._run(test, variables))
+        .reduce((curr, next) => curr.then(next), Promise.resolve())) :
+      Promise.resolve()));
   }
 
   runById(testId) {
-    return this._getVariables().then(variables => this.reader.getTest(testId)
-      .then(test => this._run(test[0], variables)));
+    return this.reader.getTest(testId).then(test => (
+      test.length ? this._getVariables().then(variables => this._run(test[0], variables)) :
+      new Error('Test not found.')
+    ));
   }
 
   _run(test, variables) {
