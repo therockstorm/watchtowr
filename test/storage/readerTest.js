@@ -6,6 +6,8 @@ import Reader from '../../src/storage/reader';
 
 const ddbStub = sinon.stub(new aws.DynamoDB());
 const s3Stub = sinon.stub(new aws.S3());
+const testsTable = 'Teststest';
+const testRunsTable = 'TestRunstest';
 const variablesBucket = 'watchtowr-test-variables';
 const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 const runId = 'ba00ee81-86f9-4014-8550-2ec523734648';
@@ -17,34 +19,42 @@ const runs = { Items: [r, r] };
 const t = { Test: { S: `{ "id": "${testId}" }` } };
 const test = { Items: [t] };
 const tests = { Items: [t, t] };
+const error = new Error('Server error occurred and we have been notified.');
 
-const setupQuery = (ret, table, key, exp, proj) => ddbStub.query.withArgs({
+const setupQuery = (table, key, exp, proj) => ddbStub.query.withArgs({
   TableName: table,
   KeyConditionExpression: key,
   ExpressionAttributeValues: exp,
   ProjectionExpression: proj,
-}).returns({ promise: () => Promise.resolve(ret) });
+});
 
 describe('getRun', () => {
-  const setupRun = ret => setupQuery(ret, 'TestRunstest', 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
+  beforeEach(() => ddbStub.query.reset());
+  const setupRun = () => setupQuery(testRunsTable, 'TestId = :testIdVal AND RunId = :runIdVal', { ':testIdVal': { S: testId }, ':runIdVal': { S: runId } }, 'Run');
+  const setupResolve = ret => setupRun().returns({ promise: () => Promise.resolve(ret) });
+  const setupReject = () => setupRun().returns({ promise: () => Promise.reject() });
 
   it('returns empty list', () => {
-    setupRun(empty);
-
+    setupResolve(empty);
     return new Reader(ddbStub).getRun(testId, runId)
       .then(res => assert.deepEqual(res, empty.Items));
   });
 
   it('returns run', () => {
-    setupRun(run);
-
+    setupResolve(run);
     return new Reader(ddbStub).getRun(testId, runId)
       .then(res => assert.deepEqual(res, run.Items.map(item => JSON.parse(item.Run.S))));
+  });
+
+  it('returns error', () => {
+    setupReject();
+    return new Reader(ddbStub).getRun(testId, runId).then(res => assert.deepEqual(res, error));
   });
 });
 
 describe('getRuns', () => {
-  const setupRuns = (ret, id = testId) => setupQuery(ret, 'TestRunstest', 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run');
+  const setupRuns = (ret, id = testId) => setupQuery(testRunsTable, 'TestId = :testIdVal', { ':testIdVal': { S: id } }, 'Run')
+    .returns({ promise: () => Promise.resolve(ret) });
   const mapRuns = val => ({ runs: val.Items.map(item => JSON.parse(item.Run.S)) });
 
   it('returns empty list', () => {
@@ -61,8 +71,7 @@ describe('getRuns', () => {
 
     return new Reader(ddbStub).getRuns([testId]).then((res) => {
       assert.equal(res.length, 1);
-      return res[0]
-        .then(x => assert.deepEqual(x, mapRuns(runs)));
+      return res[0].then(x => assert.deepEqual(x, mapRuns(runs)));
     });
   });
 
@@ -80,56 +89,69 @@ describe('getRuns', () => {
 });
 
 describe('getTest', () => {
-  const setupTest = ret => setupQuery(ret, 'Teststest', 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
+  const setupTest = () => setupQuery(testsTable, 'TestId = :testIdVal', { ':testIdVal': { S: testId } }, 'Test');
+  const setupResolve = ret => setupTest().returns({ promise: () => Promise.resolve(ret) });
+  const setupReject = () => setupTest().returns({ promise: () => Promise.reject() });
 
   it('returns empty list', () => {
-    setupTest(empty);
-
+    setupResolve(empty);
     return new Reader(ddbStub).getTest(testId)
       .then(res => assert.deepEqual(res, empty.Items));
   });
 
   it('returns test', () => {
-    setupTest(test);
-
+    setupResolve(test);
     return new Reader(ddbStub).getTest(testId)
       .then(res => assert.deepEqual(res, test.Items.map(item => JSON.parse(item.Test.S))));
+  });
+
+  it('returns error', () => {
+    setupReject();
+    return new Reader(ddbStub).getTest(testId).then(res => assert.deepEqual(res, error));
   });
 });
 
 describe('getTests', () => {
-  const setupScan = ret => ddbStub.scan.withArgs({ TableName: 'Teststest' })
-    .returns({ promise: () => Promise.resolve(ret) });
+  const setupScan = () => ddbStub.scan.withArgs({ TableName: testsTable });
+  const setupResolve = ret => setupScan().returns({ promise: () => Promise.resolve(ret) });
+  const setupReject = () => setupScan().returns({ promise: () => Promise.reject() });
 
   it('returns empty list', () => {
-    setupScan(empty);
-
+    setupResolve(empty);
     return new Reader(ddbStub).getTests().then(res => assert.deepEqual(res, empty.Items));
   });
 
   it('returns tests', () => {
-    setupScan(tests);
-
+    setupResolve(tests);
     return new Reader(ddbStub).getTests()
       .then(res => assert.deepEqual(res, tests.Items.map(item => JSON.parse(item.Test.S))));
+  });
+
+  it('returns error', () => {
+    setupReject();
+    return new Reader(ddbStub).getTests().then(res => assert.deepEqual(res, error));
   });
 });
 
 describe('getVariables', () => {
   const setupGetObject = () => s3Stub.getObject.withArgs({ Bucket: variablesBucket, Key: `${accountId}.json` });
+  const setupResolve = ret => setupGetObject().returns({ promise: () => Promise.resolve(ret) });
+  const setupReject = ret => setupGetObject().returns({ promise: () => Promise.reject(ret) });
 
   it('returns empty list', () => {
-    setupGetObject().returns({ promise: () => Promise.reject({ code: 'NoSuchKey' }) });
-
+    setupReject({ code: 'NoSuchKey' });
     return new Reader(ddbStub, s3Stub).getVariables().then(res => assert.deepEqual(res, []));
   });
 
   it('returns tests', () => {
     const variables = [{ key: 'myKey', value: 'myValue' }];
-    setupGetObject()
-      .returns({ promise: () => Promise.resolve({ Body: JSON.stringify(variables) }) });
-
+    setupResolve({ Body: JSON.stringify(variables) });
     return new Reader(ddbStub, s3Stub).getVariables()
       .then(res => assert.deepEqual(res, variables));
+  });
+
+  it('returns error', () => {
+    setupReject({ code: 'Unexpected' });
+    return new Reader(ddbStub, s3Stub).getVariables().then(res => assert.deepEqual(res, error));
   });
 });

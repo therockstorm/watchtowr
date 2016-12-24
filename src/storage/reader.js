@@ -35,8 +35,7 @@ export default class Reader {
         ExpressionAttributeValues: { ':testIdVal': { S: testId } },
         ProjectionExpression: 'Run',
       }).promise()
-      .then(data => ({ runs: data.Items.map(item => JSON.parse(item.Run.S)) }))
-      .catch(err => Reader._logAndCreateErr(err)))));
+      .then(data => ({ runs: data.Items.map(item => JSON.parse(item.Run.S)) })))));
   }
 
   getTest(testId) {
