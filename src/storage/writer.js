@@ -30,11 +30,11 @@ export default class Writer {
 
   deleteRun(testId, runId) {
     return this.ddb.deleteItem({
-      Item: { TestId: { S: testId }, RunId: { S: runId } },
+      Key: { TestId: { S: testId }, RunId: { S: runId } },
       TableName: testRunsTable,
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
-      data.Items.map(item => JSON.parse(item.Run.S))
+      data.Attributes ? [JSON.parse(data.Attributes.Run.S)] : []
     )).catch(err => Util.error(err));
   }
 
@@ -51,11 +51,11 @@ export default class Writer {
 
   deleteTest(id) {
     return this.ddb.deleteItem({
-      Item: { TestId: { S: id } },
+      Key: { TestId: { S: id } },
       TableName: testsTable,
       ReturnValues: 'ALL_OLD',
     }).promise().then(data => (
-      data.Items.map(item => JSON.parse(item.Test.S))
+      data.Attributes ? [JSON.parse(data.Attributes.Test.S)] : []
     )).catch(err => Util.error(err));
   }
 

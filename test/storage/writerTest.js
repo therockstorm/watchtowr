@@ -25,7 +25,7 @@ const setupPutRun = run => ddbStub.putItem.withArgs({
 }).returns({ promise: () => Promise.resolve() });
 
 const setupDeleteRun = ret => ddbStub.deleteItem.withArgs({
-  Item: { TestId: { S: testId }, RunId: { S: runId } },
+  Key: { TestId: { S: testId }, RunId: { S: runId } },
   TableName: testRunsTable,
   ReturnValues: 'ALL_OLD',
 }).returns({ promise: () => Promise.resolve(ret) });
@@ -43,7 +43,7 @@ const setupPutObject = variables => s3Stub.putObject.withArgs({
 }).returns({ promise: () => Promise.resolve() });
 
 const setupDeleteTest = ret => ddbStub.deleteItem.withArgs({
-  Item: { TestId: { S: testId } },
+  Key: { TestId: { S: testId } },
   TableName: testsTable,
   ReturnValues: 'ALL_OLD',
 }).returns({ promise: () => Promise.resolve(ret) });
@@ -64,7 +64,7 @@ describe('writer', () => {
   });
 
   it('deletes run', () => {
-    setupDeleteRun({ Items: [{ Run: { S: `{ "id": "${runId}" }` } }] });
+    setupDeleteRun({ Attributes: { Run: { S: `{ "id": "${runId}" }` } } });
 
     return new Writer(ddbStub).deleteRun(testId, runId)
       .then(res => assert.deepEqual(res, [{ id: runId }]));
@@ -90,7 +90,7 @@ describe('writer', () => {
   });
 
   it('deletes test', () => {
-    setupDeleteTest({ Items: [{ Test: { S: `{ "id": "${testId}" }` } }] });
+    setupDeleteTest({ Attributes: { Test: { S: `{ "id": "${testId}" }` } } });
 
     return new Writer(ddbStub).deleteTest(testId)
       .then(res => assert.deepEqual(res, [{ id: testId }]));
