@@ -27,7 +27,7 @@ const test = {
       value: '{{myKey}}',
     }],
     method: 1,
-    url: 'https://example.com/get',
+    url: 'https://{{myKey}}.com/get',
   },
   assertions: [{
     target: 1,
@@ -44,7 +44,7 @@ const tests = [test, {
   request: {
     method: 2,
     url: 'https://example.com/post',
-    body: '{"x": "y"}',
+    body: '{"x": "{{myKey}}"}',
   },
   assertions: [{
     target: 1,
@@ -69,7 +69,7 @@ describe('TestRunner', () => {
     readerStub.getTests.returns(Promise.resolve(tests));
     readerStub.getVariables.returns(variables);
     requestStub.withArgs({
-      url: tests[0].request.url,
+      url: 'https://myValue.com/get',
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: tests[0].request.body,
@@ -78,7 +78,7 @@ describe('TestRunner', () => {
       url: tests[1].request.url,
       method: 'POST',
       headers: { 'User-Agent': 'watchtowr/1.0' },
-      data: tests[1].request.body,
+      data: '{"x": "myValue"}',
     }).returns(Promise.resolve(res2));
     runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 

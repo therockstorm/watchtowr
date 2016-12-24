@@ -31,11 +31,12 @@ export default class TestRunner {
       const started = this.date.getTime();
       const startedHighRes = process.hrtime();
       const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
+      const body = test.request.body;
       return axios.request({
-        url: test.request.url,
+        url: Util.replaceAll(test.request.url, variables),
         method: method.value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
-        data: test.request.body,
+        data: body ? Util.replaceAll(body, variables) : body,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();
