@@ -34,7 +34,7 @@
     "verify-email-domain": "babel-node scripts/verifyEmailDomain.js ${npm_package_config_domain} ${npm_package_config_region}"
   },
   "devDependencies": {
-    "aws-sdk": "^2.7.17",
+    "aws-sdk": "^2.7.19",
     "axios": "^0.15.3",
     "babel-cli": "^6.18.0",
     "babel-preset-es2015": "^6.18.0",
