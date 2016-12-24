@@ -38,15 +38,13 @@ export default class TestRunner {
       const startedHighRes = process.hrtime();
       const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
       const body = test.request.body;
-      const r = {
+      return axios.request({
         url: Util.replaceAll(test.request.url, variables),
         method: method.value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: body ? Util.replaceAll(body, variables) : body,
         timeout: 90000,
-      };
-      // console.log(r);
-      return axios.request(r).then((res) => {
+      }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();
         this.notifier.notify(test, run);

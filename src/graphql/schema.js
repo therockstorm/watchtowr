@@ -10,7 +10,7 @@ import {
   GraphQLSchema,
   GraphQLString,
 } from 'graphql';
-import { GraphQLDateTime, GraphQLURL, GraphQLUUID, GraphQLLimitedString } from 'graphql-custom-types';
+import { GraphQLDateTime, GraphQLUUID, GraphQLLimitedString } from 'graphql-custom-types';
 import Resolver from './resolver';
 import TestRunner from '../runner/testRunner';
 
@@ -78,7 +78,7 @@ const requestType = new GraphQLObjectType({
       description: 'The HTTP method.',
     },
     url: {
-      type: GraphQLURL,
+      type: GraphQLString,
       description: 'The URL of the request.',
     },
     headers: {
@@ -166,7 +166,7 @@ const requestInputType = new GraphQLInputObjectType({
       description: 'The HTTP method.',
     },
     url: {
-      type: new GraphQLNonNull(GraphQLURL),
+      type: new GraphQLNonNull(GraphQLString),
       description: 'The URL of the request.',
     },
     headers: {
