@@ -18,8 +18,10 @@ export default class TestRunner {
   }
 
   runAll() {
+    const variables = this._getVariables();
     return this.reader.getTests()
-      .then(tests => tests.map(test => this._run(test, this._getVariables())));
+      .then(tests => tests.map(test => () => this._run(test, variables))
+        .reduce((curr, next) => curr.then(next), Promise.resolve()));
   }
 
   runById(testId) {
@@ -37,6 +39,7 @@ export default class TestRunner {
         method: method.value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: body ? Util.replaceAll(body, variables) : body,
+        timeout: 60000,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();

@@ -21,6 +21,10 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
       Resource: arn:aws:dynamodb:${self:provider.region}:111685254296:table/*
+    - Effect: Allow
+      Action:
+        - ses:SendEmail
+      Resource: arn:aws:ses:us-west-2:111685254296:identity/watchtowr.io
 
 functions:
   api:

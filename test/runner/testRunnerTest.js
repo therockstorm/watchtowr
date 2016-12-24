@@ -19,6 +19,7 @@ const start = [1, 2000000];
 const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId2 = 'ba00ee81-86f9-4014-8550-2ec523734648';
 const variables = [{ key: '{{myKey}}', value: 'myValue' }];
+readerStub.getVariables.returns(variables);
 const test = {
   id: testId1,
   request: {
@@ -57,6 +58,7 @@ dateStub.getTime.returns(started);
 describe('TestRunner', () => {
   beforeEach(() => {
     sinon.stub(process, 'hrtime').returns(start);
+    readerStub.getVariables.reset();
   });
 
   afterEach(() => process.hrtime.restore());
@@ -67,18 +69,19 @@ describe('TestRunner', () => {
     const result1 = { success: true };
     const result2 = { success: false };
     readerStub.getTests.returns(Promise.resolve(tests));
-    readerStub.getVariables.returns(variables);
     requestStub.withArgs({
       url: 'https://myValue.com/get',
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: tests[0].request.body,
+      timeout: 60000,
     }).returns(Promise.resolve(res1));
     requestStub.withArgs({
       url: tests[1].request.url,
       method: 'POST',
       headers: { 'User-Agent': 'watchtowr/1.0' },
       data: '{"x": "myValue"}',
+      timeout: 60000,
     }).returns(Promise.resolve(res2));
     runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
@@ -90,6 +93,7 @@ describe('TestRunner', () => {
         assert.isTrue(runBuilderStub.create.calledWith(started, start, tests[1].assertions, res2));
         assert.isTrue(notifierStub.notify.calledWith(tests[1], result2));
         assert.isTrue(writerStub.createRun.calledWith(tests[1].id, result2));
+        assert.isTrue(readerStub.getVariables.calledOnce);
       });
   });
 
@@ -97,12 +101,12 @@ describe('TestRunner', () => {
     const res = { status: 200 };
     const result = { success: true };
     readerStub.getTest.withArgs(testId1).returns(Promise.resolve([test]));
-    readerStub.getVariables.returns(variables);
     requestStub.withArgs({
       url: test.request.url,
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: test.request.body,
+      timeout: 60000,
     }).returns(Promise.resolve(res));
     runBuilderStub.build.returns(result);
 
@@ -112,6 +116,7 @@ describe('TestRunner', () => {
         assert.isTrue(runBuilderStub.create.calledWith(started, start, test.assertions, res));
         assert.isTrue(notifierStub.notify.calledWith(test, result));
         assert.isTrue(writerStub.createRun.calledWith(test.id, result));
+        assert.isTrue(readerStub.getVariables.calledOnce);
       });
   });
 });

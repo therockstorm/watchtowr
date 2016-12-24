@@ -14,8 +14,8 @@ export default class Util {
   static log(msg, isError = false) {
     if (process.env.NODE_ENV === 'test') return;
 
-    if (isError) console.error(msg); // eslint-disable-line no-console
-    else console.log(msg); // eslint-disable-line no-console
+    if (isError) console.error('[ERROR]', msg); // eslint-disable-line no-console
+    else console.log('[INFO]', msg); // eslint-disable-line no-console
   }
 
   static replaceAll(str, map) {

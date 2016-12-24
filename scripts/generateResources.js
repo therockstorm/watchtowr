@@ -30,7 +30,7 @@ const dynamoTable = (tableName, attributeDefinitions, keySchema) => ({
 });
 
 const cloudWatchAlarm = (metric, namespace, statistic, evalPeriods,
-    threshold, comparison, dimName, dimValueRef) =>
+    threshold, comparison, dimensions = []) =>
   ({
     Type: 'AWS::CloudWatch::Alarm',
     Properties: {
@@ -42,13 +42,30 @@ const cloudWatchAlarm = (metric, namespace, statistic, evalPeriods,
       EvaluationPeriods: evalPeriods,
       Threshold: threshold,
       ComparisonOperator: comparison,
-      Dimensions: [{ Name: dimName, Value: { Ref: dimValueRef } }],
+      Dimensions: dimensions,
     },
   });
 
-const cloudWatchFunctionAlarm = dimValueRef => cloudWatchAlarm('Errors', 'AWS/Lambda', 'Average', '1', '0', 'GreaterThanThreshold', 'FunctionName', dimValueRef);
+const cloudWatchFunctionAlarm = dimValueRef => cloudWatchAlarm('Errors', 'AWS/Lambda', 'Average', '1', '0', 'GreaterThanThreshold', [{ Name: 'FunctionName', Value: { Ref: dimValueRef } }]);
 
-const cloudWatchDynamoAlarm = (metric, dimValueRef) => cloudWatchAlarm(metric, 'AWS/DynamoDB', 'Sum', '5', '48', 'GreaterThanOrEqualToThreshold', 'TableName', dimValueRef);
+const cloudWatchDynamoAlarm = (metric, dimValueRef) => cloudWatchAlarm(metric, 'AWS/DynamoDB', 'Sum', '5', '48', 'GreaterThanOrEqualToThreshold', [{ Name: 'TableName', Value: { Ref: dimValueRef } }]);
+
+const cloudWatchLogMetricsAlarm = metric => cloudWatchAlarm(metric, 'LogMetrics', 'Sum', '1', '0', 'GreaterThanThreshold');
+
+const cloudWatchFilter = (logGroupRef, name) => ({
+  Type: 'AWS::Logs::MetricFilter',
+  Properties: {
+    LogGroupName: {
+      Ref: logGroupRef,
+    },
+    FilterPattern: '"[ERROR]"',
+    MetricTransformations: [{
+      MetricValue: '1',
+      MetricNamespace: 'LogMetrics',
+      MetricName: name,
+    }],
+  },
+});
 
 const s3Bucket = name => ({
   Type: 'AWS::S3::Bucket',
@@ -103,6 +120,10 @@ fs.writeFileSync(
     TestRunsTableWriteCapacityAlarm: cloudWatchDynamoAlarm('ConsumedWriteCapacityUnits', testRunsTableRef),
     ApiErrorAlarm: cloudWatchFunctionAlarm('ApiLambdaFunction'),
     RunnerErrorAlarm: cloudWatchFunctionAlarm('RunnerLambdaFunction'),
+    ApiErrorLogFilter: cloudWatchFilter('ApiLogGroup', 'api-errors'),
+    RunnerErrorLogFilter: cloudWatchFilter('RunnerLogGroup', 'runner-errors'),
+    ApiErrorLogAlarm: cloudWatchLogMetricsAlarm('api-errors'),
+    RunnerErrorLogAlarm: cloudWatchLogMetricsAlarm('runner-errors'),
     VariablesS3Bucket: s3Bucket('variables'),
     VariablesS3BucketPolicy: s3BucketPolicy('VariablesS3Bucket'),
   }),
