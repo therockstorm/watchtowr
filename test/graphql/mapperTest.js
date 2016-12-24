@@ -17,9 +17,8 @@ const expectedRun = (success = false) => ({
   results: [{ success }, { success: true }],
   success,
 });
-const test = {
-  id: testId,
-};
+const test = { id: testId };
+const variable = { key: 'myKey', value: 'myValue' };
 
 describe('toApiRun', () => {
   it('returns error if no run', () => (
@@ -56,5 +55,62 @@ describe('toApiTest', () => {
   it('maps multiple tests', () => {
     const tests = [test, test];
     return expect(Mapper.toApiTest(tests, true)).to.deep.equal(tests);
+  });
+});
+
+describe('toApiVariable', () => {
+  it('returns error if no variable', () => (
+    expect(Mapper.toApiVariable(null, false, emptyArray)).to.equal(emptyArray)
+  ));
+
+  it('returns error if empty list', () => (
+    expect(Mapper.toApiVariable([]).message).to.equal('Variable not found.')
+  ));
+
+  it('maps single variable', () => (
+    expect(Mapper.toApiVariable([variable])).to.deep.equal(variable)
+  ));
+
+  it('maps multiple variables', () => {
+    const variables = [variable, variable];
+    return expect(Mapper.toApiTest(variables, true)).to.deep.equal(variables);
+  });
+});
+
+describe('toVariables', () => {
+  const expected = [{ key: '{{myKey}}', value: 'myValue' }];
+  let vars;
+
+  beforeEach(() => {
+    vars = { key: 'myKey', value: 'myValue' };
+    return true;
+  });
+
+  it('adds replacements to variable', () => (
+    expect(Mapper.toVariables([vars])).to.deep.equal(expected)
+  ));
+
+  it('does not add replacements if exist at beginning', () => {
+    const vCopy = vars;
+    vCopy.key = `{{${vars.key}`;
+    return expect(Mapper.toVariables([vCopy])).to.deep.equal(expected);
+  });
+
+  it('does not add replacements if exist at end', () => {
+    const vCopy = vars;
+    vCopy.key = `${vars.key}}}`;
+    return expect(Mapper.toVariables([vCopy])).to.deep.equal(expected);
+  });
+
+  it('does not add replacements if exist at beginning and end', () => {
+    const vCopy = vars;
+    vCopy.key = `{{${vars.key}}}`;
+    return expect(Mapper.toVariables([vCopy])).to.deep.equal(expected);
+  });
+
+  it('remove replacements in the middle of key', () => {
+    const vCopy = vars;
+    vCopy.key = 'my{{}}Key';
+    return expect(Mapper.toVariables([vCopy])).to.deep.equal(expected);
   });
 });

@@ -17,4 +17,8 @@ export default class Util {
     if (isError) console.error(msg); // eslint-disable-line no-console
     else console.log(msg); // eslint-disable-line no-console
   }
+
+  static replaceAll(str, map) {
+    return str.replace(new RegExp(Object.keys(map).join('|'), 'gi'), matched => map[matched]);
+  }
 }

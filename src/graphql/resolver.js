@@ -45,7 +45,7 @@ export default class Resolver {
   }
 
   createVariables(variables) {
-    return this.writer.createVariables(variables);
+    return this.writer.createVariables(Mapper.toVariables(variables));
   }
 
   getVariables() {

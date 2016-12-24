@@ -10,7 +10,7 @@ import {
   GraphQLSchema,
   GraphQLString,
 } from 'graphql';
-import { GraphQLDateTime, GraphQLURL, GraphQLUUID } from 'graphql-custom-types';
+import { GraphQLDateTime, GraphQLURL, GraphQLUUID, GraphQLLimitedString } from 'graphql-custom-types';
 import Resolver from './resolver';
 import TestRunner from '../runner/testRunner';
 
@@ -154,7 +154,7 @@ const keyValueInputType = new GraphQLInputObjectType({
   description: 'A key/value pair input.',
   fields: () => ({
     key: { type: new GraphQLNonNull(GraphQLString) },
-    value: { type: new GraphQLNonNull(GraphQLString) },
+    value: { type: new GraphQLLimitedString(1, 50) },
   }),
 });
 const requestInputType = new GraphQLInputObjectType({

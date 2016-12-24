@@ -1,3 +1,5 @@
+import Util from '../util/util';
+
 export default class Mapper {
   static toApiRun(runs, isList = false, error = new Error('Run not found.')) {
     if (!runs || !runs.length) return error;
@@ -16,6 +18,14 @@ export default class Mapper {
 
   static toApiVariable(variables, isList = false, error = new Error('Variable not found.')) {
     return Mapper.toApi(variables, isList, error);
+  }
+
+  static toVariables(variables) {
+    return variables.map((v) => {
+      const vCopy = v;
+      vCopy.key = `{{${Util.replaceAll(v.key, { '{{': '', '}}': '' })}}}`;
+      return vCopy;
+    });
   }
 
   static toApi(obj, isList = false, error = new Error('Not found.')) {
