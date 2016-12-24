@@ -14,6 +14,7 @@ const runBuilderStub = sinon.stub(new RunBuilder());
 const notifierStub = sinon.stub(new Notifier());
 const dateStub = sinon.stub(new Date());
 const requestStub = sinon.stub(axios, 'request');
+const timeout = 90000;
 const started = 123;
 const start = [1, 2000000];
 const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
@@ -74,14 +75,14 @@ describe('TestRunner', () => {
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: tests[0].request.body,
-      timeout: 60000,
+      timeout,
     }).returns(Promise.resolve(res1));
     requestStub.withArgs({
       url: tests[1].request.url,
       method: 'POST',
       headers: { 'User-Agent': 'watchtowr/1.0' },
       data: '{"x": "myValue"}',
-      timeout: 60000,
+      timeout,
     }).returns(Promise.resolve(res2));
     runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
@@ -106,7 +107,7 @@ describe('TestRunner', () => {
       method: 'GET',
       headers: { 'User-Agent': 'watchtowr/1.0', 'x-key1': 'myValue' },
       data: test.request.body,
-      timeout: 60000,
+      timeout,
     }).returns(Promise.resolve(res));
     runBuilderStub.build.returns(result);
 

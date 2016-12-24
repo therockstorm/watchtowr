@@ -39,7 +39,7 @@ export default class TestRunner {
         method: method.value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: body ? Util.replaceAll(body, variables) : body,
-        timeout: 60000,
+        timeout: 90000,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();
