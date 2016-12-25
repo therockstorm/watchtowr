@@ -10,6 +10,8 @@ provider:
   cfLogs: true
   timeout: 6
   memorySize: 128
+  apiKeys:
+    - secret
   environment:
     NODE_ENV: ${env:NODE_ENV}
   iamRoleStatements:
@@ -34,6 +36,7 @@ functions:
           path: graphql
           method: POST
           cors: true
+          private: true
   runner:
     handler: runner.handle
     timeout: 300

@@ -100,6 +100,27 @@ const mutations = [
   //     value: "400"
   //   }]
   // }) { id }}`,
+  // `mutation { updateTest(test: {
+  //   id: "11e6ca3d-3c26-0800-92ce-8b6ea89e1912"
+  //   name: "Transfer"
+  //   request: {
+  //     method: POST
+  //     url: "{{BaseUrl}}/transfers"
+  //     headers: [{
+  //     key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }, {
+  //       key: "Content-Type", value: "{{Content-Type}}"
+  //     }],
+  //     body: "{\"amount\":{\"currency\":\"USD\",\"value\":\"0.01\"}}"
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "400"
+  //   }]
+  // }) { id }}`,
   // `mutation {
   //   createVariables(variables: [
   //     { key: "Accept", value: "application/vnd.dwolla.v1.hal+json" },

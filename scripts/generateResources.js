@@ -5,6 +5,7 @@ import Util from './util';
 
 const stage = Util.required(process.env.NODE_ENV, 'stage');
 const service = Util.required(process.argv[2], 'service');
+const apiId = Util.required(process.argv[3], 'apiId');
 
 const snsTopic = () => ({
   Type: 'AWS::SNS::Topic',
@@ -106,6 +107,16 @@ const s3BucketPolicy = bucketRef => ({
   },
 });
 
+const usagePlan = () => ({
+  Type: 'AWS::ApiGateway::UsagePlan',
+  Properties: {
+    ApiStages: [{ ApiId: apiId, Stage: stage }],
+    Quota: { Limit: 5000, Period: 'MONTH' },
+    Throttle: { BurstLimit: 20, RateLimit: 10 },
+    UsagePlanName: `${stage}-${service}-plan`,
+  },
+});
+
 const testsTableRef = 'TestsTable';
 const testRunsTableRef = 'TestRunsTable';
 fs.writeFileSync(
@@ -126,5 +137,6 @@ fs.writeFileSync(
     RunnerErrorLogAlarm: cloudWatchLogMetricsAlarm('runner-errors'),
     VariablesS3Bucket: s3Bucket('variables'),
     VariablesS3BucketPolicy: s3BucketPolicy('VariablesS3Bucket'),
+    ApiUsagePlan: usagePlan(),
   }),
 );

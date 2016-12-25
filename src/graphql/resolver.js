@@ -53,7 +53,7 @@ export default class Resolver {
   }
 
   updateTest(test) {
-    return this.getTest(test.id).then(t => (t instanceof Error ? t : this.writer.updateTest(t)));
+    return this.getTest(test.id).then(t => (t instanceof Error ? t : this.writer.updateTest(test)));
   }
 
   deleteTest(testId) {

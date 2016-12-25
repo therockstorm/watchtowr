@@ -175,8 +175,8 @@ describe('updateTest', () => {
 
   it('returns updated test', () => {
     const test = { id: testId };
-    readerStub.getTest.withArgs(test.id).returns(Promise.resolve([test]));
-    writerStub.updateTest.returns(Promise.resolve(expectedTest));
+    readerStub.getTest.withArgs(test.id).returns(Promise.resolve([{}]));
+    writerStub.updateTest.withArgs(test).returns(Promise.resolve(expectedTest));
 
     return resolver.updateTest(test).then(res => (
       expect(res).to.deep.equal(expectedTest)
