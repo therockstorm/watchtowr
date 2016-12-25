@@ -3,6 +3,7 @@ import { astFromValue } from 'graphql/utilities';
 import RunBuilder from './runBuilder';
 import Reader from '../storage/reader';
 import Writer from '../storage/writer';
+import Mapper from '../graphql/mapper';
 import Notifier from './notifier';
 import Util from '../util/util';
 import { httpMethodEnum } from '../graphql/schema';
@@ -18,16 +19,16 @@ export default class TestRunner {
   }
 
   runAll() {
-    return this.reader.getTests().then(tests => (
-      tests.length ? this._getVariables()
-      .then(variables => tests.map(test => () => this._run(test, variables))
+    return this.reader.getTests().then(tests => (tests.length ?
+      this._getVariables().then(variables => tests.map(test => () => this._run(test, variables))
         .reduce((curr, next) => curr.then(next), Promise.resolve())) :
       Promise.resolve()));
   }
 
   runById(testId) {
     return this.reader.getTest(testId).then(test => (
-      test.length ? this._getVariables().then(variables => this._run(test[0], variables)) :
+      test.length ?
+      this._getVariables().then(variables => this._run(test[0], variables).then(Mapper.toApiRun)) :
       new Error('Test not found.')
     ));
   }
@@ -36,13 +37,11 @@ export default class TestRunner {
     return new Promise((resolve, reject) => {
       const started = this.date.getTime();
       const startedHighRes = process.hrtime();
-      const method = astFromValue(test.request.method, httpMethodEnum) || 'GET';
-      const body = test.request.body;
       return axios.request({
         url: Util.replaceAll(test.request.url, variables),
-        method: method.value,
+        method: astFromValue(test.request.method, httpMethodEnum).value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
-        data: body ? Util.replaceAll(body, variables) : body,
+        data: test.request.body ? Util.replaceAll(test.request.body, variables) : test.request.body,
         timeout: 90000,
         validateStatus: status => status >= 100 && status < 600,
       }).then((res) => {
