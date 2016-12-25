@@ -7,7 +7,7 @@ const email = `
   <head>
     <meta name="viewport" content="width=device-width">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Simple Transactional Email</title>
+    <title>Test Failed: TEST_NAME</title>
     <style type="text/css">
     @media only screen and (max-width: 620px) {
       table[class=body] h1 {
@@ -80,22 +80,30 @@ const email = `
                     <tr>
                       <td style="font-family:sans-serif;font-size:14px;vertical-align:top;">
                         <p style="font-family:sans-serif;font-size:14px;font-weight:normal;margin:0;Margin-bottom:15px;">Failed: TEST_NAME</p>
-                        <table border="0" cellpadding="0" cellspacing="0" class="btn btn-primary" style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;box-sizing:border-box;width:100%;">
-                          <tbody>
-                            <tr>
-                              <td align="left" style="font-family:sans-serif;font-size:14px;vertical-align:top;padding-bottom:15px;">
-                                <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width:100%;width:auto;">
-                                  <tbody>
-                                    <tr>
-                                      <td style="font-family:sans-serif;font-size:14px;vertical-align:top;background-color:#ffffff;border-radius:5px;text-align:center;background-color:#3498db;"> <a href="RESULTS_LINK" target="_blank" style="text-decoration:underline;background-color:#ffffff;border:solid 1px #3498db;border-radius:5px;box-sizing:border-box;color:#3498db;cursor:pointer;display:inline-block;font-size:14px;font-weight:bold;margin:0;padding:12px 25px;text-decoration:none;text-transform:capitalize;background-color:#3498db;border-color:#3498db;color:#ffffff;">View Results</a> </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <p style="font-family:sans-serif;font-size:14px;font-weight:normal;margin:0;Margin-bottom:15px;">Good luck!</p>
+                        <p style="font-family:sans-serif;font-size:14px;font-weight:normal;margin:0;Margin-bottom:15px;">Run the following query in the <a href="API_CONSOLE_URL" target="_blank" style="text-decoration:underline;cursor:pointer;">API Console</a> for more information:</p>
+                        <p style="font-family:sans-serif;font-size:14px;font-weight:normal;margin:0;Margin-bottom:15px;">
+                          <pre style="overflow: auto;white-space: pre-wrap;background: #eee;padding: 1em;">
+query {
+  run(id: "RUN_ID") {
+    id
+    started
+    elapsedMs
+    response {
+      statusCode
+    }
+    success
+    results {
+      expected {
+        target
+        comparison
+        value
+      }
+      actual
+      success
+    }
+  }
+}</pre>
+                        </p>
                       </td>
                     </tr>
                   </table>
@@ -122,7 +130,7 @@ const email = `
     </table>
   </body>
 </html>`;
-const resultsLink = 'https://api.watchtowr.io';
+const apiConsoleUrl = 'https://api.watchtowr.io';
 
 export default class Notifier {
   constructor(ses = new aws.SES({ region: 'us-west-2' })) {
@@ -139,16 +147,20 @@ export default class Notifier {
         ],
       },
       Message: {
-        Body: {
-          Html: {
-            Data: Util.replaceAll(email, { TEST_NAME: test.name, RESULTS_LINK: resultsLink }),
-          },
-          Text: {
-            Data: `Failed: ${test.name}. View results at ${resultsLink}`,
-          },
-        },
         Subject: {
           Data: `Test Failed: ${test.name}`,
+        },
+        Body: {
+          Html: {
+            Data: Util.replaceAll(email, {
+              TEST_NAME: test.name,
+              API_CONSOLE_URL: apiConsoleUrl,
+              RUN_ID: run.id,
+            }),
+          },
+          Text: {
+            Data: `Failed: ${test.name}. Query for run ID "${run.id}" in the API Console at ${apiConsoleUrl} for more information.`,
+          },
         },
       },
       Source: 'noreploy@watchtowr.io',
