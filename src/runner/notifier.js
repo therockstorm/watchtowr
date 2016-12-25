@@ -108,9 +108,7 @@ const email = `
               <table border="0" cellpadding="0" cellspacing="0" style="border-collapse:separate;mso-table-lspace:0pt;mso-table-rspace:0pt;width:100%;">
                 <tr>
                   <td class="content-block" style="font-family:sans-serif;font-size:14px;vertical-align:top;color:#999999;font-size:12px;text-align:center;">
-                    <span class="apple-link" style="color:#999999;font-size:12px;text-align:center;">Watchtowr.io, San Francisco, CA 94102</span>
-                    <br>
-                     <a href="http://i.imgur.com/CScmqnj.gif" style="color:#3498db;text-decoration:underline;color:#999999;font-size:12px;text-align:center;">Change notification settings</a>
+                    <span class="apple-link" style="color:#999999;font-size:12px;text-align:center;">Watchtowr.io, San Francisco, CA</span>
                   </td>
                 </tr>
               </table>
