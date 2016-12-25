@@ -44,6 +44,7 @@ export default class TestRunner {
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: body ? Util.replaceAll(body, variables) : body,
         timeout: 90000,
+        validateStatus: status => status >= 100 && status < 600,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         const run = this.runBuilder.build();

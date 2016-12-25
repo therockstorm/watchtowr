@@ -67,12 +67,37 @@ const mutations = [
   //   name: "Root"
   //   request: {
   //     method: GET
-  //     url: "https://www.example.com/"
+  //     url: "{{BaseUrl}}/"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }]
   //   }
   //   assertions: [{
   //     target: STATUS_CODE
   //     comparison: EQUAL
   //     value: "200"
+  //   }]
+  // }) { id }}`,
+  // `mutation { createTest(test: {
+  //   name: "Root"
+  //   request: {
+  //     method: POST
+  //     url: "{{BaseUrl}}/transfers"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }, {
+  //       key: "Content-Type", value: "{{Content-Type}}"
+  //     }],
+  //     body: "{\"amount\":{\"currency\":\"USD\",\"value\":\"0.01\"}}"
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "400"
   //   }]
   // }) { id }}`,
   // `mutation {
