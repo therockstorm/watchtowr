@@ -27,7 +27,7 @@ export default class TestRunner {
   runById(testId) {
     return this.reader.getTest(testId).then(test => (
       test.length ?
-      this._getVariables().then(variables => this._run(test[0], variables).then(Mapper.toApiRun)) :
+      this._getVariables().then(variables => this._run(test[0], variables).then(true)) :
       new Error('Test not found.')
     ));
   }

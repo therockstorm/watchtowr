@@ -22,6 +22,7 @@ provider:
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
       Resource: arn:aws:dynamodb:${self:provider.region}:111685254296:table/*
     - Effect: Allow
       Action:

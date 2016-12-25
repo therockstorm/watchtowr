@@ -76,7 +76,7 @@ const createTestMutation = `mutation { createTest(test: {
     value: "1200"
     }]
 }) { id } }`;
-const runTestMutation = `mutation { runTest(id: "${testId}") { id } }`;
+const runTestMutation = `mutation { runTest(id: "${testId}") }`;
 const updateTestMutation = `mutation { updateTest(test: {
   id: "${testId}",
   name: "My test name",

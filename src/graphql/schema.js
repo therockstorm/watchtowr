@@ -345,7 +345,7 @@ export default class Schema extends GraphQLSchema {
             resolve: (root, { variables }) => resolver.createVariables(variables),
           },
           runTest: {
-            type: runType,
+            type: GraphQLBoolean,
             args: {
               id: {
                 description: 'The id of the test to run.',
