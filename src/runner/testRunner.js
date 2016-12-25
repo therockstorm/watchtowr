@@ -10,12 +10,11 @@ import { httpMethodEnum } from '../graphql/schema';
 
 export default class TestRunner {
   constructor(reader = new Reader(), writer = new Writer(), runBuilder = new RunBuilder(),
-    notifier = new Notifier(), date = new Date()) {
+    notifier = new Notifier()) {
     this.reader = reader;
     this.writer = writer;
     this.runBuilder = runBuilder;
     this.notifier = notifier;
-    this.date = date;
   }
 
   runAll() {
@@ -35,7 +34,7 @@ export default class TestRunner {
 
   _run(test, variables) {
     return new Promise((resolve, reject) => {
-      const started = this.date.getTime();
+      const started = new Date().getTime();
       const startedHighRes = process.hrtime();
       return axios.request({
         url: Util.replaceAll(test.request.url, variables),

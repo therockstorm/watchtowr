@@ -12,11 +12,10 @@ const readerStub = sinon.stub(new Reader());
 const writerStub = sinon.stub(new Writer());
 const runBuilderStub = sinon.stub(new RunBuilder());
 const notifierStub = sinon.stub(new Notifier());
-const dateStub = sinon.stub(new Date());
 const requestStub = sinon.stub(axios, 'request');
 const timeout = 90000;
 const validateStatus = sinon.match.any;
-const started = 123;
+const started = sinon.match.any;
 const start = [1, 2000000];
 const testId1 = '11e6af50-8fbf-b952-80db-218d3d616683';
 const testId2 = 'ba00ee81-86f9-4014-8550-2ec523734648';
@@ -54,7 +53,6 @@ const tests = [test, {
     value: '201',
   }],
 }];
-dateStub.getTime.returns(started);
 
 describe('TestRunner', () => {
   beforeEach(() => {
@@ -95,7 +93,7 @@ describe('TestRunner', () => {
       }).returns(Promise.resolve(res2));
       runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
 
-      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub).runAll()
+      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub).runAll()
         .then(() => {
           assert.isTrue(runBuilderStub.create
             .calledWith(started, start, tests[0].assertions, res1));
@@ -111,7 +109,7 @@ describe('TestRunner', () => {
 
     it('does not make calls if no tests', () => {
       readerStub.getTests.returns(Promise.resolve([]));
-      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub)
+      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub)
         .runAll(testId1)
         .then(() => {
           assert.isFalse(requestStub.called);
@@ -139,7 +137,7 @@ describe('TestRunner', () => {
       }).returns(Promise.resolve(res));
       runBuilderStub.build.returns(result);
 
-      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub)
+      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub)
         .runById(testId1)
         .then(() => {
           assert.isTrue(runBuilderStub.create.calledWith(started, start, test.assertions, res));
@@ -151,7 +149,7 @@ describe('TestRunner', () => {
 
     it('returns error if no test', () => {
       readerStub.getTest.withArgs(testId1).returns(Promise.resolve([]));
-      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub, dateStub)
+      return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub)
         .runById(testId1)
         .then((res) => {
           assert.deepEqual(res.message, 'Test not found.');
