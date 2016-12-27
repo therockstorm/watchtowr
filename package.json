@@ -23,7 +23,7 @@
     "clean": "rm -rf dist",
     "deploy": "npm run clean && npm run build && cd dist && serverless deploy --stage $NODE_ENV --verbose && cd ..",
     "get-info": "babel-node scripts/getInfo.js ${npm_package_config_provider} ${npm_package_config_domain}",
-    "lint:js": "eslint . --fix",
+    "lint": "eslint . --fix",
     "logs": "cd src && serverless logs --function ${npm_package_config_function} --stage $NODE_ENV --startTime 1m && cd ..",
     "logs:api": "npm run logs --watchtowr:function=api",
     "logs:runner": "npm run logs --watchtowr:function=runner",

@@ -36,7 +36,9 @@ functions:
       - http:
           path: graphql
           method: POST
-          cors: true
+          cors:
+            origins:
+              - 'http://localhost:3000'
           private: true
   runner:
     handler: runner.handle
