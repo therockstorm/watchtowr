@@ -7,6 +7,8 @@ import Form from './Form';
 import './CustomGraphiQL.css';
 import logo from '../../icons/watchtowr.png';
 
+const styles = { height: '100vh' };
+
 export default class CustomGraphiQL extends Component {
   constructor(props) {
     super(props);
@@ -72,7 +74,7 @@ query {
 
   render() {
     return (
-      <div className="graphiql">
+      <div style={styles}>
         <GraphiQL {...this.state} >
           <GraphiQL.Logo>
             <img src={logo} height="34px" alt="logo" />
