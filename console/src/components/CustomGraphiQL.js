@@ -2,8 +2,10 @@ import React, { Component, PropTypes } from 'react';
 import GraphiQL from 'graphiql';
 import fetch from 'isomorphic-fetch';
 import 'graphiql/graphiql.css';
-import './CustomGraphiQL.css';
 import Footer from './Footer';
+import Form from './Form';
+import './CustomGraphiQL.css';
+import logo from '../../icons/watchtowr.png';
 
 export default class CustomGraphiQL extends Component {
   constructor(props) {
@@ -55,7 +57,7 @@ query {
       },
       body: JSON.stringify(params),
       credentials: 'include',
-        // mode: 'no-cors',
+      // mode: 'no-cors',
     })
       .then(res => res.json())
       .catch(err => (err instanceof TypeError ? "Error: Make sure you've added your 'X-API-Key' header above." : err));
@@ -73,19 +75,17 @@ query {
       <div className="graphiql">
         <GraphiQL {...this.state} >
           <GraphiQL.Logo>
-            <img src="./watchtowr-v1.png" height="34px" alt="logo" />
+            <img src={logo} height="34px" alt="logo" />
           </GraphiQL.Logo>
           <GraphiQL.Toolbar>
-            <div className="form">
-              <form>
-                <input
-                  id="api-key"
-                  type="password"
-                  placeholder="X-API-Key Header"
-                  onChange={this.onApiKeyChange}
-                />
-              </form>
-            </div>
+            <Form>
+              <input
+                id="api-key"
+                type="password"
+                placeholder="X-API-Key Header"
+                onChange={this.onApiKeyChange}
+              />
+            </Form>
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
             <Footer />

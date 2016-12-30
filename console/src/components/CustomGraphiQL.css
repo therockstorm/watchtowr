@@ -1,22 +1,3 @@
 .graphiql {
   height: 100vh;
 }
-
-.form {
-	padding: 10px 15px;
-}
-
-/*<label htmlFor="api-key">X-API-Key</label>
-.form label {
-	float: left;
-	margin: 6px;
-}*/
-
-.form input {
-	border: 0;
-	float: left;
-  font-size: 14px;
-	margin: 0 0 10px;
-	padding: 5px;
-  width: 125px;
-}
