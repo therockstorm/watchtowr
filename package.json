@@ -1,54 +1,10 @@
 {
   "name": "watchtowr",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://bitbucket.org/therockstorm/watchtowr"
-  },
-  "config": {
-    "apiId": "0dx44nhb4l",
-    "domain": "watchtowr.io",
-    "function": "api",
-    "provider": "letsencrypt",
-    "region": "us-west-2"
-  },
   "scripts": {
-    "build": "npm run build:resources && npm run build:services",
-    "build:resources": "babel-node scripts/generateResources.js ${npm_package_name} ${npm_package_config_apiId}",
-    "build:services": "mkdir dist && cp src/serverless.yml dist && cp src/package.json dist && cd dist && yarn && snyk test && snyk monitor && cd .. && babel --out-dir=dist ./src",
-    "cert:deploy": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_region} ${npm_package_config_apiId}",
-    "cert:issue": "$ACME_DIR/acme.sh --issue --dns --domain ${npm_package_config_domain} --domain www.${npm_package_config_domain} --domain api.${npm_package_config_domain}",
-    "cert:renew": "$ACME_DIR/acme.sh --upgrade && . ~/.bashrc && $ACME_DIR/acme.sh --renew --domain ${npm_package_config_domain} --domain www.${npm_package_config_domain} --domain api.${npm_package_config_domain}",
-    "clean": "rm -rf dist",
-    "deploy": "npm run clean && npm run build && cd dist && serverless deploy --stage $NODE_ENV --verbose && cd ..",
-    "get-info": "babel-node scripts/getInfo.js ${npm_package_config_provider} ${npm_package_config_domain}",
-    "lint": "eslint . --fix",
-    "logs": "cd src && serverless logs --function ${npm_package_config_function} --stage $NODE_ENV --startTime 1m && cd ..",
-    "logs:api": "npm run logs --watchtowr:function=api",
-    "logs:runner": "npm run logs --watchtowr:function=runner",
-    "test": "NODE_ENV=test mocha --require babel-register --recursive test/",
-    "test:api": "babel-node scripts/apiFunc.js",
-    "test:runner": "babel-node scripts/runnerFunc.js",
-    "update-schema": "babel-node scripts/updateSchema.js",
-    "verify-email-domain": "babel-node scripts/verifyEmailDomain.js ${npm_package_config_domain} ${npm_package_config_region}"
-  },
-  "devDependencies": {
-    "aws-sdk": "^2.7.19",
-    "axios": "^0.15.3",
-    "babel-cli": "^6.18.0",
-    "babel-preset-es2015": "^6.18.0",
-    "chai": "^3.5.0",
-    "chai-as-promised": "^6.0.0",
-    "dataloader": "^1.2.0",
-    "eslint": "^3.12.2",
-    "eslint-config-airbnb-base": "^11.0.0",
-    "eslint-plugin-import": "^2.2.0",
-    "graphql": "^0.8.2",
-    "graphql-custom-types": "^0.7.1",
-    "js-yaml": "^3.7.0",
-    "mocha": "^3.2.0",
-    "sinon": "^1.17.6",
-    "uuid": "^3.0.1"
+    "all:install": "./all.sh yarn",
+    "all:lint": "./all.sh 'yarn run lint'",
+    "all:test": "./all.sh 'yarn run test'"
   }
 }

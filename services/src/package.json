@@ -1,11 +1,7 @@
 {
-  "name": "watchtowr",
-  "version": "1.0.0",
+  "name": "services",
+  "version": "0.0.1",
   "private": true,
-  "repository": {
-    "type": "git",
-    "url": "https://bitbucket.org/therockstorm/watchtowr"
-  },
   "dependencies": {
     "axios": "0.15.3",
     "dataloader": "1.2.0",

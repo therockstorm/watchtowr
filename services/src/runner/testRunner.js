@@ -3,7 +3,6 @@ import { astFromValue } from 'graphql/utilities';
 import RunBuilder from './runBuilder';
 import Reader from '../storage/reader';
 import Writer from '../storage/writer';
-import Mapper from '../graphql/mapper';
 import Notifier from './notifier';
 import Util from '../util/util';
 import { httpMethodEnum } from '../graphql/schema';

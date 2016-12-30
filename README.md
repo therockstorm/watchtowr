@@ -1,27 +1,19 @@
 # Watchtowr
 
-Watchtowr API monitoring and testing. Built using [Serverless](https://serverless.com) and [GraphQL](http://graphql.org).
+Watchtowr API monitoring and testing.
 
 ## Getting Started
 
 Install nvm, clone the repo, and then...
 
-Install dependencies: `nvm install && nvm use && npm install -g serverless yarn && yarn`  
-NPM scripts assume you have the following ~/.bashrc file:  
+Install and use Node version references in .nvm: `nvm install && nvm use`  
+Install yarn: `brew install yarn watchman && yarn`  
+Install global dependencies: `yarn global add serverless snyk`  
+
+Some scripts assume the following in your ~/.bashrc or ~/.bash_profile:  
 ```
 export NODE_ENV=dev
 
 export ACME_DIR=<path_to_acme_install>
 . "$ACME_DIR/acme.sh.env"
 ```
-
-## Development
-
-To do a clean deploy:
-
-- Remove [API mapping](https://us-west-2.console.aws.amazon.com/apigateway/home?region=us-west-2#/custom-domain-names/api.watchtowr.io)
-- Delete [stack](https://us-west-2.console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks?filter=active&tab=events)
-- Delete deployment [bucket](https://console.aws.amazon.com/s3/home?region=us-west-2)
-- Delete [tables](https://us-west-2.console.aws.amazon.com/dynamodb/home?region=us-west-2)
-- `npm run deploy`
-- `npm run map-api`

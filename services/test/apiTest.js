@@ -12,7 +12,8 @@ const response = body => ({
   statusCode: 200,
   headers: {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Credentials': 'true',
+    'Access-Control-Allow-Origin': 'http://localhost:3000',
     'X-Request-Id': context.awsRequestId,
   },
   body,
