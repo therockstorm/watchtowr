@@ -1,6 +1,6 @@
 import React from 'react';
 
-const buttonStyles = {
+const styles = {
   border: '1px solid #eee',
   borderRadius: 3,
   backgroundColor: '#FFFFFF',
@@ -11,10 +11,7 @@ const buttonStyles = {
 };
 
 const Button = ({ children, onClick }) => (
-  <button
-    style={buttonStyles}
-    onClick={onClick}
-  >
+  <button style={styles} onClick={onClick} >
     {children}
   </button>
 );

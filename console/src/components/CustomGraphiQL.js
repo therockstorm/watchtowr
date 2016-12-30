@@ -3,6 +3,7 @@ import GraphiQL from 'graphiql';
 import fetch from 'isomorphic-fetch';
 import 'graphiql/graphiql.css';
 import './CustomGraphiQL.css';
+import Footer from './Footer';
 
 export default class CustomGraphiQL extends Component {
   constructor(props) {
@@ -87,9 +88,7 @@ query {
             </div>
           </GraphiQL.Toolbar>
           <GraphiQL.Footer>
-            <p>
-              &copy; 2017 Watchtowr.io · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
-            </p>
+            <Footer />
           </GraphiQL.Footer>
         </GraphiQL>
       </div>
