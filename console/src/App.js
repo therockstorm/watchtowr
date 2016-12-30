@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import CustomGraphiQL from './CustomGraphiQL';
+import CustomGraphiQL from './components/CustomGraphiQL';
 
 const search = window.location.search;
 const parameters = {};

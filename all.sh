@@ -1,5 +1,5 @@
 #!/bin/bash
-dirs=( components console services )
+dirs=( console services )
 arg=("$@")
 
 for dir in "${dirs[@]}"; do

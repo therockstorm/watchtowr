@@ -69,28 +69,30 @@ query {
 
   render() {
     return (
-      <GraphiQL {...this.state} >
-        <GraphiQL.Logo>
-          <img src="./watchtowr-v1.png" height="34px" alt="logo" />
-        </GraphiQL.Logo>
-        <GraphiQL.Toolbar>
-          <div className="form">
-            <form>
-              <input
-                id="api-key"
-                type="password"
-                placeholder="X-API-Key Header"
-                onChange={this.onApiKeyChange}
-              />
-            </form>
-          </div>
-        </GraphiQL.Toolbar>
-        <GraphiQL.Footer>
-          <p>
-            &copy; 2017 Watchtowr.io · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
-          </p>
-        </GraphiQL.Footer>
-      </GraphiQL>
+      <div className="graphiql">
+        <GraphiQL {...this.state} >
+          <GraphiQL.Logo>
+            <img src="./watchtowr-v1.png" height="34px" alt="logo" />
+          </GraphiQL.Logo>
+          <GraphiQL.Toolbar>
+            <div className="form">
+              <form>
+                <input
+                  id="api-key"
+                  type="password"
+                  placeholder="X-API-Key Header"
+                  onChange={this.onApiKeyChange}
+                />
+              </form>
+            </div>
+          </GraphiQL.Toolbar>
+          <GraphiQL.Footer>
+            <p>
+              &copy; 2017 Watchtowr.io · <a href="/terms">Terms</a> · <a href="/privacy">Privacy</a>
+            </p>
+          </GraphiQL.Footer>
+        </GraphiQL>
+      </div>
     );
   }
 }

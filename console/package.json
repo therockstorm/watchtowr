@@ -6,7 +6,9 @@
     "lint": "eslint src/ --fix",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom"
+    "test": "react-scripts test --env=jsdom",
+    "storybook": "NODE_ENV=development start-storybook -p 9009 -s public",
+    "build-storybook": "build-storybook -s public"
   },
   "dependencies": {
     "graphiql": "^0.8.0",
@@ -22,6 +24,7 @@
     "eslint-plugin-import": "2.2.0",
     "eslint-plugin-jsx-a11y": "2.2.3",
     "eslint-plugin-react": "6.8.0",
-    "react-scripts": "0.8.4"
+    "react-scripts": "0.8.4",
+    "@kadira/storybook": "^2.21.0"
   }
 }
