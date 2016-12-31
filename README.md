@@ -7,7 +7,7 @@ Watchtowr API monitoring and testing.
 Install nvm, clone the repo, and then...
 
 Install and use Node version references in .nvm: `nvm install && nvm use`  
-Install yarn: `brew install yarn watchman && yarn`  
+Install yarn: Either `npm install -g yarn` or `brew install yarn watchman`  
 Install global dependencies: `yarn global add serverless snyk`  
 
 Some scripts assume the following in your ~/.bashrc or ~/.bash_profile:  

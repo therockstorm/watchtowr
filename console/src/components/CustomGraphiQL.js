@@ -57,7 +57,7 @@ query {
         'x-api-key': this.state.apiKey,
       },
       body: JSON.stringify(params),
-      credentials: 'include',
+      // credentials: 'include',
       // mode: 'no-cors',
     })
       .then(res => res.json())

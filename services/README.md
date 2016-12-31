@@ -18,4 +18,3 @@ To do a clean deploy:
 - Delete [tables](https://us-west-2.console.aws.amazon.com/dynamodb/home?region=us-west-2)
 - `npm run deploy`
 - `npm run map-api`
-- Add 'Access-Control-Allow-Credentials': 'true' to OPTIONS and that and 'Access-Control-Allow-Origin': 'http://localhost:3000'

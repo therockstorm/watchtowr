@@ -15,14 +15,14 @@ const waitForCompletion = () => {
       count += 1;
       const stack = res.Stacks[0];
       const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-      if (count % 12 === 0) console.log('---------------------------')
+      if (count % 8 === 0) console.log('---------------------------');
       console.log(`${timestamp} ${stack.StackStatus}`);
       if (stack.StackStatusReason) console.log(stack.StackStatusReason);
       if (!stack.StackStatus.endsWith('IN_PROGRESS')) process.exit();
     }).catch((err) => {
-      console.error(`Unexpected err=${err}`);
+      console.error(`err=${err}`);
       process.exit(1);
-    }), 5000)
+    }), 15000);
 };
 
 const createStack = () => {

@@ -48,11 +48,13 @@ iam.uploadServerCertificate({
         }).promise().then(() => {
           console.log('Cert uploaded and assigned, CloudFront distribution deploying...');
           const params = { Id: distributionId };
+          let count = 0;
           setInterval(() => cloudfront.getDistribution(params).promise().then((getRes) => {
-            if (getRes.Distribution.Status === 'Deployed') {
-              console.log('CloudFront distribution deployed.');
-              process.exit();
-            } else console.log(`Status=${getRes.Distribution.Status}`);
+            count += 1;
+            const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+            if (count % 8 === 0) console.log('---------------------------');
+            console.log(`${timestamp} ${getRes.Distribution.Status}`);
+            if (getRes.Distribution.Status === 'Deployed') process.exit();
           }).catch((getErr) => {
             if (getErr) {
               console.error(`getErr=${getErr}`);
