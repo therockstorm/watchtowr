@@ -6,7 +6,7 @@ Serverless and GraphQL services.
 
 Install nvm, clone the repo, and then...
 
-Install dependencies: `yarn`  
+Install dependencies: `yarn && yarn run all:install`  
 
 ## Development
 
@@ -19,5 +19,5 @@ To do a clean deploy:
 - Delete [tables](https://us-west-2.console.aws.amazon.com/dynamodb/home?region=us-west-2)
 - Delete [Custom Domain](https://us-west-2.console.aws.amazon.com/apigateway/home?region=us-west-2#/custom-domain-names)
 - Comment out ApiUsagePlan and then run `yarn run deploy`
-- Update package.json apiId, uncomment plan and deploy again
+- Update package.json apiId, uncomment plan and deploy again, add API Key to plan
 - `yarn run cert:deploy`

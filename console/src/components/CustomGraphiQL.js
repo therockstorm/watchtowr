@@ -57,11 +57,7 @@ query {
         'x-api-key': this.state.apiKey,
       },
       body: JSON.stringify(params),
-      // credentials: 'include',
-      // mode: 'no-cors',
-    })
-      .then(res => res.json())
-      .catch(err => (err instanceof TypeError ? "Error: Make sure you've added your 'X-API-Key' header above." : err));
+    }).then(res => res.json()).catch(err => (err instanceof TypeError ? "Error: Make sure you've added your 'X-API-Key' header above." : err));
   }
 
   updateURL() {
