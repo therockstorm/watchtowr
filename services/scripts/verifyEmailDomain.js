@@ -1,7 +1,6 @@
-import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
+import aws from 'aws-sdk';
 import required from '../../util/util';
 
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SES.html
 const domain = required(process.argv[2], 'domain');
 const region = required(process.argv[3], 'region');
 const ses = new aws.SES({ region });

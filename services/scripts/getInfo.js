@@ -1,6 +1,5 @@
-import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
+import aws from 'aws-sdk';
 
-// https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/IAM.html
 const iam = new aws.IAM();
 const certService = process.argv[2];
 const domain = process.argv[3];

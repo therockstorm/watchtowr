@@ -1,6 +1,6 @@
 import fs from 'fs';
 import path from 'path';
-import { printSchema } from 'graphql'; // eslint-disable-line import/no-extraneous-dependencies
+import { printSchema } from 'graphql';
 import Schema from '../src/graphql/schema';
 
 fs.writeFileSync(

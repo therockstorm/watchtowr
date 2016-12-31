@@ -1,4 +1,4 @@
-import yaml from 'js-yaml'; // eslint-disable-line import/no-extraneous-dependencies
+import yaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import required from '../../util/util';

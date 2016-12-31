@@ -1,4 +1,4 @@
-import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
+import aws from 'aws-sdk';
 import fs from 'fs';
 import path from 'path';
 import required from '../../util/util';
@@ -8,18 +8,22 @@ const stackName = `${required(process.argv[2], 'service')}-${stage}`;
 const cloudformation = new aws.CloudFormation({ region: required(process.argv[3], 'region') });
 const templateBody = fs.readFileSync(path.join(__dirname, 'stack.yml'), 'utf8');
 
-const waitForCompletion = () => (
+const waitForCompletion = () => {
+  let count = 0;
   setInterval(() => cloudformation.describeStacks({ StackName: stackName }).promise()
     .then((res) => {
+      count += 1;
       const stack = res.Stacks[0];
       const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+      if (count % 12 === 0) console.log('---------------------------')
       console.log(`${timestamp} ${stack.StackStatus}`);
       if (stack.StackStatusReason) console.log(stack.StackStatusReason);
       if (!stack.StackStatus.endsWith('IN_PROGRESS')) process.exit();
     }).catch((err) => {
       console.error(`Unexpected err=${err}`);
       process.exit(1);
-    }), 5000));
+    }), 5000)
+};
 
 const createStack = () => {
   console.log(`Creating ${stackName}...`);
