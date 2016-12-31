@@ -3,10 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "config": {
+    "distributionId": "EF6CMDQS065EF",
+    "domain": "watchtowr.io",
+    "provider": "letsencrypt",
     "region": "us-west-2"
   },
   "scripts": {
     "build": "react-scripts build",
+    "cert:deploy": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_distributionId}",
     "clean": "rm -rf build",
     "deploy": "aws s3 sync build/ s3://www.watchtowr.io/",
     "deploy:stack": "babel-node scripts/deployStack.js ${npm_package_name} ${npm_package_config_region}",

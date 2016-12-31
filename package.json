@@ -3,9 +3,15 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
+    "all:clean": "",
     "all:install": "./all.sh yarn",
-    "all:lint": "./all.sh 'yarn run lint'",
-    "all:test": "./all.sh 'yarn run test'"
+    "all:lint": "./all.sh 'yarn run lint'", //?
+    "all:test": "./all.sh 'yarn run test'",  //?
+    "cert:deploy": "",
+    "cert:deploy:console": "",
+    "cert:deploy:services": "",
+    "cert:issue": "",
+    "cert:renew": ""
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",

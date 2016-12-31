@@ -4,7 +4,6 @@ import fetch from 'isomorphic-fetch';
 import 'graphiql/graphiql.css';
 import Footer from './Footer';
 import Form from './Form';
-import './CustomGraphiQL.css';
 import logo from '../../icons/watchtowr.png';
 
 const styles = { height: '100vh' };
