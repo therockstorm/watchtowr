@@ -1,5 +1,5 @@
 import React from 'react';
-import { storiesOf, action } from '@kadira/storybook';
+import { storiesOf, action } from '@kadira/storybook'; // eslint-disable-line import/no-extraneous-dependencies
 import CustomGraphiQL from '../components/CustomGraphiQL';
 import Footer from '../components/Footer';
 import Form from '../components/Form';
