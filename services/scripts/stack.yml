@@ -1,0 +1,243 @@
+EmailSnsTopic:
+  Type: 'AWS::SNS::Topic'
+  Properties:
+    DisplayName: watchtowrEmail
+    Subscription:
+      - Protocol: email
+        Endpoint: rocky.warren+watchtowr-alarm@gmail.com
+TestsTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: TestId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: TestId
+        KeyType: HASH
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: Testsdev
+TestRunsTable:
+  Type: 'AWS::DynamoDB::Table'
+  DeletionPolicy: Retain
+  Properties:
+    AttributeDefinitions:
+      - AttributeName: TestId
+        AttributeType: S
+      - AttributeName: RunId
+        AttributeType: S
+    KeySchema:
+      - AttributeName: TestId
+        KeyType: HASH
+      - AttributeName: RunId
+        KeyType: RANGE
+    ProvisionedThroughput:
+      ReadCapacityUnits: 1
+      WriteCapacityUnits: 1
+    TableName: TestRunsdev
+TestsTableReadCapacityAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: ConsumedReadCapacityUnits
+    Namespace: AWS/DynamoDB
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '5'
+    Threshold: '48'
+    ComparisonOperator: GreaterThanOrEqualToThreshold
+    Dimensions:
+      - Name: TableName
+        Value:
+          Ref: TestsTable
+TestsTableWriteCapacityAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: ConsumedWriteCapacityUnits
+    Namespace: AWS/DynamoDB
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '5'
+    Threshold: '48'
+    ComparisonOperator: GreaterThanOrEqualToThreshold
+    Dimensions:
+      - Name: TableName
+        Value:
+          Ref: TestsTable
+TestRunsTableReadCapacityAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: ConsumedReadCapacityUnits
+    Namespace: AWS/DynamoDB
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '5'
+    Threshold: '48'
+    ComparisonOperator: GreaterThanOrEqualToThreshold
+    Dimensions:
+      - Name: TableName
+        Value:
+          Ref: TestRunsTable
+TestRunsTableWriteCapacityAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: ConsumedWriteCapacityUnits
+    Namespace: AWS/DynamoDB
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '5'
+    Threshold: '48'
+    ComparisonOperator: GreaterThanOrEqualToThreshold
+    Dimensions:
+      - Name: TableName
+        Value:
+          Ref: TestRunsTable
+ApiErrorAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: Errors
+    Namespace: AWS/Lambda
+    Statistic: Average
+    Period: '60'
+    EvaluationPeriods: '1'
+    Threshold: '0'
+    ComparisonOperator: GreaterThanThreshold
+    Dimensions:
+      - Name: FunctionName
+        Value:
+          Ref: ApiLambdaFunction
+RunnerErrorAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: Errors
+    Namespace: AWS/Lambda
+    Statistic: Average
+    Period: '60'
+    EvaluationPeriods: '1'
+    Threshold: '0'
+    ComparisonOperator: GreaterThanThreshold
+    Dimensions:
+      - Name: FunctionName
+        Value:
+          Ref: RunnerLambdaFunction
+ApiErrorLogFilter:
+  Type: 'AWS::Logs::MetricFilter'
+  Properties:
+    LogGroupName:
+      Ref: ApiLogGroup
+    FilterPattern: '"[ERROR]"'
+    MetricTransformations:
+      - MetricValue: '1'
+        MetricNamespace: LogMetrics
+        MetricName: api-errors
+RunnerErrorLogFilter:
+  Type: 'AWS::Logs::MetricFilter'
+  Properties:
+    LogGroupName:
+      Ref: RunnerLogGroup
+    FilterPattern: '"[ERROR]"'
+    MetricTransformations:
+      - MetricValue: '1'
+        MetricNamespace: LogMetrics
+        MetricName: runner-errors
+ApiErrorLogAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: api-errors
+    Namespace: LogMetrics
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '1'
+    Threshold: '0'
+    ComparisonOperator: GreaterThanThreshold
+    Dimensions: []
+RunnerErrorLogAlarm:
+  Type: 'AWS::CloudWatch::Alarm'
+  Properties:
+    AlarmActions:
+      - Ref: EmailSnsTopic
+    MetricName: runner-errors
+    Namespace: LogMetrics
+    Statistic: Sum
+    Period: '60'
+    EvaluationPeriods: '1'
+    Threshold: '0'
+    ComparisonOperator: GreaterThanThreshold
+    Dimensions: []
+VariablesS3Bucket:
+  Type: 'AWS::S3::Bucket'
+  DeletionPolicy: Retain
+  Properties:
+    BucketName: watchtowr-dev-variables
+VariablesS3BucketPolicy:
+  Type: 'AWS::S3::BucketPolicy'
+  Properties:
+    Bucket:
+      Ref: VariablesS3Bucket
+    PolicyDocument:
+      Statement:
+        - Effect: Allow
+          Principal: '*'
+          Action:
+            - 's3:GetObject'
+            - 's3:PutObject'
+          Resource:
+            - 'Fn::Join':
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: VariablesS3Bucket
+                  - /*
+        - Sid: DenyIncorrectEncryptionHeader
+          Effect: Deny
+          Principal: '*'
+          Action: 's3:PutObject'
+          Resource:
+            - 'Fn::Join':
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: VariablesS3Bucket
+                  - /*
+          Condition:
+            StringNotEquals:
+              's3:x-amz-server-side-encryption': AES256
+        - Sid: DenyUnEncryptedObjectUploads
+          Effect: Deny
+          Principal: '*'
+          Action: 's3:PutObject'
+          Resource:
+            - 'Fn::Join':
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: VariablesS3Bucket
+                  - /*
+          Condition:
+            'Null':
+              's3:x-amz-server-side-encryption': 'true'
+ApiUsagePlan:
+  Type: 'AWS::ApiGateway::UsagePlan'
+  Properties:
+    ApiStages:
+      - ApiId: 0dx44nhb4l
+        Stage: dev
+    Quota:
+      Limit: 5000
+      Period: MONTH
+    Throttle:
+      BurstLimit: 20
+      RateLimit: 10
+    UsagePlanName: dev-watchtowr-plan

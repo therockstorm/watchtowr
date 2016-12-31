@@ -1,6 +1,6 @@
 frameworkVersion: "=1.4.0"
 
-service: watchtowr
+service: ${file(./package.json):name}
 
 provider:
   name: aws
@@ -47,4 +47,4 @@ functions:
       - schedule: rate(30 minutes)
 
 resources:
-  Resources: ${file(../scripts/resources.yml)}
+  Resources: ${file(../scripts/stack.yml)}

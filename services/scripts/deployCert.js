@@ -1,14 +1,14 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs';
 import path from 'path';
-import Util from './util';
+import required from '../../util/util';
 
-const acmePath = Util.required(process.env.ACME_DIR, 'acmePath');
-const stage = Util.required(process.env.NODE_ENV, 'stage');
-const certService = Util.required(process.argv[2], 'certService');
-const domain = Util.required(process.argv[3], 'domain');
-const region = Util.required(process.argv[4], 'region');
-const apiId = Util.required(process.argv[5], 'apiId');
+const acmePath = required(process.env.ACME_DIR, 'acmePath');
+const stage = required(process.env.NODE_ENV, 'stage');
+const certService = required(process.argv[2], 'certService');
+const domain = required(process.argv[3], 'domain');
+const region = required(process.argv[4], 'region');
+const apiId = required(process.argv[5], 'apiId');
 const apigateway = new aws.APIGateway({ region });
 const apiDomain = `api.${domain}`;
 

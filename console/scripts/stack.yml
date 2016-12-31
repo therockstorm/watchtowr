@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: 'The AWS CloudFormation template for this React application'
+Resources:
+  WebsiteS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: www.watchtowr.io
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+  WebsiteS3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: WebsiteS3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: PolicyForCloudFrontPrivateContent
+        Statement:
+          - Sid: 'Grant CloudFront Origin Identity access to support private content'
+            Effect: Allow
+            Principal:
+              CanonicalUser: ee3c58586ddbef45e1ff3fc0fce26966d20f4363a2e5ec6ec31f26e67802b2c381300ca2656c13f9f6280603e0290970
+            Action: s3:GetObject
+            Resource:
+              - Fn::Join:
+                - ''
+                - - 'arn:aws:s3:::'
+                  - Ref: WebsiteS3Bucket
+                  - "/*"
+  RedirectS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: watchtowr.io
+      WebsiteConfiguration:
+        RedirectAllRequestsTo:
+          HostName: www.watchtowr.io
+          Protocol: https
+  WebsiteCloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Origins:
+          - DomainName:
+              Fn::GetAtt:
+                - WebsiteS3Bucket
+                - DomainName
+            Id: WebsiteS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: origin-access-identity/cloudfront/E3J2X3R6XXSJV2
+        Enabled: true
+        HttpVersion: http2
+        DefaultRootObject: index.html
+        Aliases:
+          - watchtowr.io
+          - www.watchtowr.io
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - GET
+            - HEAD
+          Compress: true
+          TargetOriginId: WebsiteS3Origin
+          ForwardedValues:
+            QueryString: true
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: redirect-to-https
+        PriceClass: PriceClass_100
+  WebsiteRoute53ARecords:
+    Type: "AWS::Route53::RecordSetGroup"
+    Properties:
+      HostedZoneName: watchtowr.io.
+      RecordSets:
+        - Name: watchtowr.io.
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName:
+              Fn::GetAtt:
+                - WebsiteCloudFrontDistribution
+                - DomainName
+        - Name: www.watchtowr.io.
+          Type: A
+          AliasTarget:
+            HostedZoneId: Z2FDTNDATAQYW2
+            DNSName:
+              Fn::GetAtt:
+                - WebsiteCloudFrontDistribution
+                - DomainName

@@ -1,9 +1,9 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
-import Util from './util';
+import required from '../../util/util';
 
 // https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/SES.html
-const domain = Util.required(process.argv[2], 'domain');
-const region = Util.required(process.argv[3], 'region');
+const domain = required(process.argv[2], 'domain');
+const region = required(process.argv[3], 'region');
 const ses = new aws.SES({ region });
 const route53 = new aws.Route53();
 const params = { Domain: domain };

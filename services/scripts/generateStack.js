@@ -1,11 +1,11 @@
 import yaml from 'js-yaml'; // eslint-disable-line import/no-extraneous-dependencies
 import fs from 'fs';
 import path from 'path';
-import Util from './util';
+import required from '../../util/util';
 
-const stage = Util.required(process.env.NODE_ENV, 'stage');
-const service = Util.required(process.argv[2], 'service');
-const apiId = Util.required(process.argv[3], 'apiId');
+const stage = required(process.env.NODE_ENV, 'stage');
+const service = required(process.argv[2], 'service');
+const apiId = required(process.argv[3], 'apiId');
 
 const snsTopic = () => ({
   Type: 'AWS::SNS::Topic',
@@ -120,7 +120,7 @@ const usagePlan = () => ({
 const testsTableRef = 'TestsTable';
 const testRunsTableRef = 'TestRunsTable';
 fs.writeFileSync(
-  path.join(__dirname, './resources.yml'),
+  path.join(__dirname, './stack.yml'),
   yaml.safeDump({
     EmailSnsTopic: snsTopic(),
     TestsTable: dynamoTable(`Tests${stage}`, [attributeDef('TestId', 'S')], [keyDef('TestId', 'HASH')]),

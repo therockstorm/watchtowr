@@ -9,5 +9,4 @@ coverage
 # Misc
 .DS_Store
 schema.graphql
-resources.yml
 .env
