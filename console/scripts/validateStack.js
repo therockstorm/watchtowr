@@ -3,8 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import required from '../../util/util';
 
-const region = required(process.argv[2], 'region');
-const cloudformation = new aws.CloudFormation({ region });
+const cloudformation = new aws.CloudFormation({ region: required(process.argv[2], 'region') });
 
 cloudformation.validateTemplate({
   TemplateBody: fs.readFileSync(path.join(__dirname, 'stack.yml'), 'utf8'),
