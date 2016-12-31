@@ -44,7 +44,7 @@ Resources:
           - DomainName:
               Fn::GetAtt:
                 - WebsiteS3Bucket
-                - WebsiteURL
+                - DomainName
             Id: WebsiteS3Origin
             S3OriginConfig:
               OriginAccessIdentity: origin-access-identity/cloudfront/E3J2X3R6XXSJV2

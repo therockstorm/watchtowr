@@ -5,5 +5,5 @@ GraphiQL API Console.
 ## Getting Started
 
 Install dependencies: `yarn`  
-Run dev mode: `npm start`  
-Generate prod build: `npm run build`  
+Run dev mode: `yarn start`  
+Generate prod build: `yarn run build`  

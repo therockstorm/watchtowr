@@ -1,10 +1,10 @@
 EmailSnsTopic:
   Type: 'AWS::SNS::Topic'
   Properties:
-    DisplayName: watchtowrEmail
+    DisplayName: watchtowr-servicesEmail
     Subscription:
       - Protocol: email
-        Endpoint: rocky.warren+watchtowr-alarm@gmail.com
+        Endpoint: rocky.warren+watchtowr-services-alarm@gmail.com
 TestsTable:
   Type: 'AWS::DynamoDB::Table'
   DeletionPolicy: Retain
@@ -18,7 +18,7 @@ TestsTable:
     ProvisionedThroughput:
       ReadCapacityUnits: 1
       WriteCapacityUnits: 1
-    TableName: Testsdev
+    TableName: Testsdevelopment
 TestRunsTable:
   Type: 'AWS::DynamoDB::Table'
   DeletionPolicy: Retain
@@ -36,7 +36,7 @@ TestRunsTable:
     ProvisionedThroughput:
       ReadCapacityUnits: 1
       WriteCapacityUnits: 1
-    TableName: TestRunsdev
+    TableName: TestRunsdevelopment
 TestsTableReadCapacityAlarm:
   Type: 'AWS::CloudWatch::Alarm'
   Properties:
@@ -183,7 +183,7 @@ VariablesS3Bucket:
   Type: 'AWS::S3::Bucket'
   DeletionPolicy: Retain
   Properties:
-    BucketName: watchtowr-dev-variables
+    BucketName: watchtowr-services-development-variables
 VariablesS3BucketPolicy:
   Type: 'AWS::S3::BucketPolicy'
   Properties:
@@ -232,12 +232,12 @@ ApiUsagePlan:
   Type: 'AWS::ApiGateway::UsagePlan'
   Properties:
     ApiStages:
-      - ApiId: 0dx44nhb4l
-        Stage: dev
+      - ApiId: 0j5zt4krpf
+        Stage: development
     Quota:
       Limit: 5000
       Period: MONTH
     Throttle:
       BurstLimit: 20
       RateLimit: 10
-    UsagePlanName: dev-watchtowr-plan
+    UsagePlanName: development-watchtowr-services-plan
