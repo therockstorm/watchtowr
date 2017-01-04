@@ -1,10 +1,11 @@
 import aws from 'aws-sdk'; // eslint-disable-line import/no-extraneous-dependencies
 import Util from '../util/util';
+import { name } from '../package.json';
 
 const stage = process.env.NODE_ENV;
 const testsTable = `Tests${stage}`;
 const testRunsTable = `TestRuns${stage}`;
-const variablesBucket = `watchtowr-${stage}-variables`;
+const variablesBucket = `${name}-${stage}-variables`;
 const config = { region: 'us-west-2' };
 const accountId = '98f2250c-c782-4ed6-bc52-297268daf490';
 
