@@ -13,7 +13,7 @@
     "cert:deploy": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_distributionId}",
     "deploy": "yarn run build && aws s3 sync --delete build/ s3://www.watchtowr.io/",
     "deploy:stack": "babel-node scripts/deployStack.js ${npm_package_name} ${npm_package_config_region}",
-    "invalidate": "bable-node scripts/invalidateCache.js ${npm_package_config_distributionId} ${npm_package_config_region}",
+    "invalidate": "babel-node scripts/invalidateCache.js ${npm_package_config_distributionId} ${npm_package_config_region}",
     "lint": "eslint src/ --fix",
     "start": "react-scripts start",
     "storybook": "start-storybook -p 9009 -s public",

@@ -44,9 +44,9 @@ export default class TestRunner {
         validateStatus: status => status >= 100 && status < 600,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
-        const run = this.runBuilder.build();
+        const run = this.writer.createRun(test.id, this.runBuilder.build());
         this.notifier.notify(test, run);
-        resolve(this.writer.createRun(test.id, run));
+        resolve(run);
       }).catch((err) => {
         // createRun failure
         Util.error(err);

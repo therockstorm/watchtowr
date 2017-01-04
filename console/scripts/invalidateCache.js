@@ -16,14 +16,15 @@ const waitForCompletion = (id) => {
     }).catch((err) => {
       console.error(`err=${err}`);
       process.exit(1);
-    }), 5000);
+    }), 15000);
 };
 
 cloudfront.createInvalidation({
   DistributionId: distributionId,
   InvalidationBatch: {
     CallerReference: Date.now().toString(),
-    Paths: { Quantity: 3, Items: ['/index.html', '/static/js/*', '/static/css/*'] },
+    Paths: { Quantity: 2, Items: ['/index.html', '/static/js/*'] },
+    // Paths: { Quantity: 3, Items: ['/index.html', '/static/js/*', '/static/css/*'] },
   },
 }).promise().then((res) => {
   console.log(`Cloudfront invalidation created: ${res.Invalidation.Id}`);
