@@ -1,6 +1,6 @@
 import React from 'react';
 
-const styles = { 'text-align': 'center' };
+const styles = { textAlign: 'center' };
 
 const Footer = () => (
   <p style={styles}>

@@ -1,6 +1,7 @@
 import React, { Component, PropTypes } from 'react';
 import GraphiQL from 'graphiql';
 import fetch from 'isomorphic-fetch';
+import { buildClientSchema, introspectionQuery } from 'graphql/utilities';
 import 'graphiql/graphiql.css';
 import Footer from './Footer';
 import Form from './Form';
@@ -44,8 +45,16 @@ query {
     this.updateURL();
   }
 
+  updateSchema() {
+    return this.fetcher({ query: introspectionQuery }).then((result) => {
+      if (result && result.data) {
+        this.setState({ schema: buildClientSchema(result.data) });
+      }
+    });
+  }
+
   _onApiKeyChange(event) {
-    this.setState({ apiKey: event.target.value });
+    this.setState({ apiKey: event.target.value }, this.updateSchema);
   }
 
   fetcher(params) {
