@@ -8,6 +8,9 @@ export default class Util {
   }
 
   static error(msg) {
+    if (process.env.NODE_ENV === 'development' && msg.code === 'ResourceNotFoundException') {
+      console.log('!!!!!! Check AWS creds !!!!!!'); // eslint-disable-line no-console
+    }
     Util.log(msg, true);
   }
 

@@ -84,7 +84,7 @@ const email = `
                         <p style="font-family:sans-serif;font-size:14px;font-weight:normal;margin:0;Margin-bottom:15px;">
                           <pre style="overflow: auto;white-space: pre-wrap;background: #eee;padding: 1em;">
 query {
-  run(id: "RUN_ID") {
+  run(testId: "TEST_ID", id: "RUN_ID") {
     results {
       expected {
         target
@@ -123,7 +123,7 @@ query {
     </table>
   </body>
 </html>`;
-const apiConsoleUrl = 'https://www.watchtowr.io/?query=query%20%7B%0A%20%20run(id%3A%20%22RUN_ID%22)%20%7B%0A%20%20%20%20results%20%7B%0A%20%20%20%20%20%20expected%20%7B%0A%20%20%20%20%20%20%20%20target%0A%20%20%20%20%20%20%20%20comparison%0A%20%20%20%20%20%20%20%20value%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20actual%0A%20%20%20%20%20%20success%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D';
+const urlTemplate = 'https://www.watchtowr.io/?query=query%20%7B%0A%20%20run(testId%3A%20%22TEST_ID%22%2C%20id%3A%20%22RUN_ID%22)%20%7B%0A%20%20%20%20results%20%7B%0A%20%20%20%20%20%20expected%20%7B%0A%20%20%20%20%20%20%20%20target%0A%20%20%20%20%20%20%20%20comparison%0A%20%20%20%20%20%20%20%20value%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20actual%0A%20%20%20%20%20%20success%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D';
 
 export default class Notifier {
   constructor(ses = new aws.SES({ region: 'us-west-2' })) {
@@ -131,9 +131,11 @@ export default class Notifier {
   }
 
   notify(test, run) {
-    const valid = run && run.results && run.results.length;
-    if (!valid || run.results.every(result => result.success)) return;
-    apiConsoleUrl.replace('RUN_ID', run.id);
+    if (!test || !test.id || !test.name || !run || !run.id) {
+      Util.error(`Missing replacements, email not sent. test=${JSON.stringify(test)} run=${JSON.stringify(run)}`);
+      return;
+    }
+    const url = Util.replaceAll(urlTemplate, { TEST_ID: test.id, RUN_ID: run.id });
     this.ses.sendEmail({
       Destination: {
         ToAddresses: [
@@ -147,13 +149,14 @@ export default class Notifier {
         Body: {
           Html: {
             Data: Util.replaceAll(email, {
+              TEST_ID: test.id,
               TEST_NAME: test.name,
-              API_CONSOLE_URL: apiConsoleUrl,
+              API_CONSOLE_URL: url,
               RUN_ID: run.id,
             }),
           },
           Text: {
-            Data: `Failed: ${test.name}. Query for run ID "${run.id}" in the API Console at ${apiConsoleUrl} for more information.`,
+            Data: `Failed: ${test.name}. Use this pre-built query URL for more information: ${url}`,
           },
         },
       },

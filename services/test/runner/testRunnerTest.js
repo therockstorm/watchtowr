@@ -92,6 +92,8 @@ describe('TestRunner', () => {
         validateStatus,
       }).returns(Promise.resolve(res2));
       runBuilderStub.build.onFirstCall().returns(result1).onSecondCall().returns(result2);
+      writerStub.createRun.withArgs(tests[0].id, result1).returns(Promise.resolve(result1));
+      writerStub.createRun.withArgs(tests[1].id, result2).returns(Promise.resolve(result2));
 
       return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub).runAll()
         .then(() => {
@@ -136,6 +138,7 @@ describe('TestRunner', () => {
         validateStatus,
       }).returns(Promise.resolve(res));
       runBuilderStub.build.returns(result);
+      writerStub.createRun.withArgs(tests.id, result).returns(Promise.resolve(result));
 
       return new TestRunner(readerStub, writerStub, runBuilderStub, notifierStub)
         .runById(testId1)
