@@ -123,7 +123,7 @@ query {
     </table>
   </body>
 </html>`;
-const urlTemplate = 'https://www.watchtowr.io/?query=query%20%7B%0A%20%20run(testId%3A%20%22TEST_ID%22%2C%20id%3A%20%22RUN_ID%22)%20%7B%0A%20%20%20%20results%20%7B%0A%20%20%20%20%20%20expected%20%7B%0A%20%20%20%20%20%20%20%20target%0A%20%20%20%20%20%20%20%20comparison%0A%20%20%20%20%20%20%20%20value%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20actual%0A%20%20%20%20%20%20success%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D';
+const urlTemplate = 'https://www.watchtowr.io/?query=query%20%7B%0A%20%20run(testId%3A%20%22TEST_ID%22%2C%20id%3A%20%22RUN_ID%22)%20%7B%0A%20%20%20%20started%0A%20%20%20%20results%20%7B%0A%20%20%20%20%20%20expected%20%7B%0A%20%20%20%20%20%20%20%20target%0A%20%20%20%20%20%20%20%20comparison%0A%20%20%20%20%20%20%20%20value%0A%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20actual%0A%20%20%20%20%20%20success%0A%20%20%20%20%7D%0A%20%20%7D%0A%7D';
 
 export default class Notifier {
   constructor(ses = new aws.SES({ region: 'us-west-2' })) {

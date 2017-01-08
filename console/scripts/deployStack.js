@@ -9,15 +9,11 @@ const cloudformation = new aws.CloudFormation({ region: required(process.argv[3]
 const templateBody = fs.readFileSync(path.join(__dirname, 'stack.yml'), 'utf8');
 
 const waitForCompletion = () => {
-  let count = 0;
   setInterval(() => cloudformation.describeStacks({ StackName: stackName }).promise()
     .then((res) => {
-      count += 1;
       const stack = res.Stacks[0];
-      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-      if (count % 8 === 0) console.log('---------------------------');
-      console.log(`${timestamp} ${stack.StackStatus}`);
-      if (stack.StackStatusReason) console.log(stack.StackStatusReason);
+      process.stdout.write('.');
+      if (stack.StackStatusReason) console.log(`\n${stack.StackStatusReason}`);
       if (!stack.StackStatus.endsWith('IN_PROGRESS')) process.exit();
     }).catch((err) => {
       console.error(`err=${err}`);

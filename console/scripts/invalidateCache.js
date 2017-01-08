@@ -5,13 +5,9 @@ const distributionId = required(process.argv[2], 'distributionId');
 const cloudfront = new aws.CloudFront({ region: required(process.argv[3], 'region') });
 
 const waitForCompletion = (id) => {
-  let count = 0;
   setInterval(() => cloudfront.getInvalidation({ DistributionId: distributionId, Id: id }).promise()
     .then((res) => {
-      count += 1;
-      const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
-      if (count % 8 === 0) console.log('---------------------------');
-      console.log(`${timestamp} ${res.Invalidation.Status}`);
+      process.stdout.write('.');
       if (res.Invalidation.Status === 'Completed') process.exit();
     }).catch((err) => {
       console.error(`err=${err}`);
