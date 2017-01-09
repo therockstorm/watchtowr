@@ -14,6 +14,8 @@ export default class TestRunner {
     this.writer = writer;
     this.runBuilder = runBuilder;
     this.notifier = notifier;
+    this.localVars = {};
+    this.globalVars = { '{{randomString}}': Util.randomString() };
   }
 
   runAll() {
@@ -36,17 +38,22 @@ export default class TestRunner {
       const started = new Date().getTime();
       const startedHighRes = process.hrtime();
       return axios.request({
-        url: Util.replaceAll(test.request.url, variables),
+        url: Util.replaceAll(test.request.url, Object.assign({}, variables, this.localVars)),
         method: astFromValue(test.request.method, httpMethodEnum).value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
-        data: test.request.body ? Util.replaceAll(test.request.body, variables) : test.request.body,
+        data: test.request.body ? Util.replaceAll(
+          test.request.body, Object.assign({}, this.globalVars, variables)) : test.request.body,
         timeout: 90000,
         validateStatus: status => status >= 100 && status < 600,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
+        if (test.variables) {
+          test.variables.forEach((v) => {
+            if (v.key in res.headers) this.localVars[`{{${v.value}}}`] = res.headers[v.key];
+          });
+        }
         this.writer.createRun(test.id, this.runBuilder.build()).then((run) => {
-          const valid = run && run.results && run.results.length &&
-            run.results.every(result => result.success);
+          const valid = run && run.results && run.results.every(result => result.success);
           if (!valid) this.notifier.notify(test, run);
           resolve(run);
         });

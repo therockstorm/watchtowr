@@ -213,6 +213,10 @@ const testInputType = new GraphQLInputObjectType({
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(assertionInputType))),
       description: 'A list of assertions to run on the response.',
     },
+    variables: {
+      type: new GraphQLList(keyValueInputType),
+      description: 'A list of variables to extract from the response.',
+    },
   }),
 });
 const testUpdateInputType = new GraphQLInputObjectType({
@@ -234,6 +238,10 @@ const testUpdateInputType = new GraphQLInputObjectType({
     assertions: {
       type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(assertionInputType))),
       description: 'A list of assertions to run on the response.',
+    },
+    variables: {
+      type: new GraphQLList(keyValueInputType),
+      description: 'A list of variables to extract from the response.',
     },
   }),
 });
@@ -259,6 +267,10 @@ export default class Schema extends GraphQLSchema {
         assertions: {
           type: new GraphQLNonNull(new GraphQLList(assertionType)),
           description: 'A list of assertions to run on the response.',
+        },
+        variables: {
+          type: new GraphQLNonNull(new GraphQLList(keyValueType)),
+          description: 'A list of variables to extract from the response.',
         },
         lastFailure: {
           type: runType,

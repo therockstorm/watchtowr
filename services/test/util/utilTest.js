@@ -1,5 +1,6 @@
 import chai from 'chai';
 import { it } from 'mocha';
+import Immutable from 'immutable';
 import Util from '../../src/util/util';
 
 const expect = chai.expect;
@@ -15,8 +16,14 @@ it('Replaces all instances', () => {
 });
 
 it('Test random stuff here', () => {
-  const bytes = s => ~-encodeURI(s).split(/%..|./).length; // eslint-disable-line no-bitwise
-  const jsonSize = s => bytes(JSON.stringify(s));
-
-  console.log(jsonSize({ 'shirt-color': 'R', 'shirt-size': 'M' }));
+  // const x = [{ key: 'Dog', value: 'good' }, { key: 'Cat', value: 'bad' }];
+  // const l = Immutable.fromJS(x).map((q) => {
+  //   return { [q.get('key')]: q.get('value') };
+  // });
+  // console.log(JSON.stringify(l));
+  // const variables = {};
+  // x.map(v => (variables[v.key] = v.value));
+  // const y = Immutable.fromJS(variables);
+  // console.log(y);
+  // console.log(y.get('Dog'));
 });

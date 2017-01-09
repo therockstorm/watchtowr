@@ -1,4 +1,5 @@
 import uuid from 'uuid';
+import crypto from 'crypto';
 
 export default class Util {
   static sequencialId() {
@@ -23,5 +24,9 @@ export default class Util {
 
   static replaceAll(str, map) {
     return str.replace(new RegExp(Object.keys(map).join('|'), 'gi'), matched => map[matched]);
+  }
+
+  static randomString() {
+    return crypto.randomBytes(5).toString('hex');
   }
 }

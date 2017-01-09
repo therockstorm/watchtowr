@@ -92,12 +92,53 @@ const mutations = [
   //     }, {
   //       key: "Content-Type", value: "{{Content-Type}}"
   //     }],
-  //     body: "{\"amount\":{\"currency\":\"USD\",\"value\":\"0.01\"}}"
+  //     body: ${JSON.stringify("{\"amount\":{\"currency\":\"USD\",\"value\":\"0.01\"}}")}
   //   }
   //   assertions: [{
   //     target: STATUS_CODE
   //     comparison: EQUAL
   //     value: "400"
+  //   }]
+  // }) { id }}`,
+  // `mutation { createTest(test: {
+  //   name: "POST /customers"
+  //   request: {
+  //     method: POST
+  //     url: "{{BaseUrl}}/customers"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }, {
+  //       key: "Content-Type", value: "{{Content-Type}}"
+  //     }]
+  //     body: ${JSON.stringify("{\"firstName\": \"Verified\", \"lastName\": \"Customer\", \"email\": \"{{randomString}}@example.com\", \"type\": \"personal\", \"address1\": \"123 Main St\", \"city\": \"San Francisco\", \"state\": \"CA\", \"postalCode\": \"94012\", \"dateOfBirth\": \"1980-01-01\", \"ssn\": \"1234\"}")}
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "201"
+  //   }]
+  //   variables: [{
+  //     key: "location"
+  //     value: "CreatedCustomerUrl"
+  //   }]
+  // }) { id }}`,
+  // `mutation { createTest(test: {
+  //   name: "GET /customers/{id}"
+  //   request: {
+  //     method: GET
+  //     url: "{{CreatedCustomerUrl}}"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }]
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "200"
   //   }]
   // }) { id }}`,
   // `mutation { updateTest(test: {
@@ -137,10 +178,12 @@ const mutations = [
   //     id
   //   }
   // }`,
-  `mutation {
-    runTest(id: "11e6d24e-c159-35b0-90df-e7a3b6deb350")
-  }`,
+  // `mutation {
+  //   runTest(id: "11e6d60b-41cc-2120-9bf0-0584478cfc08")
+  // }`,
 ];
+
+// console.log(JSON.stringify(mutations[0]));
 
 mutations.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
   if (err) console.log(`err=${JSON.stringify(err)}`);

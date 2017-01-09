@@ -48,6 +48,10 @@ const testsSnippet = `
     comparison
     value
   }
+  variables {
+    key
+    value
+  }
   lastFailure {
     ${runsSnippet}
   }
@@ -57,38 +61,46 @@ const testsSnippet = `
 const testQuery = `query { test(id: "${testId}") { ${testsSnippet} } }`;
 const testsQuery = `query { tests { ${testsSnippet} } }`;
 const createVariablesMutation = `mutation { createVariables(variables: [{
-  key: "{{Accept}}",
+  key: "{{Accept}}"
   value: "application/json"
 }]) { key } }`;
 const createTestMutation = `mutation { createTest(test: {
   name: "My test name"
   request: {
     headers: [{
-      key: "x-api-key",
+      key: "x-api-key"
       value: "xyz"
-    }],
-    method: GET,
+    }]
+    method: GET
     url: "https://www.rockywarren.com"
   },
   assertions: [{
-    target: ELAPSED_TIME_MS,
-    comparison: LESS_THAN,
+    target: ELAPSED_TIME_MS
+    comparison: LESS_THAN
     value: "1200"
-    }]
+  }],
+  variables: [{
+    key: "MyVariable"
+    value: "Location"
+  }]
 }) { id } }`;
 const runTestMutation = `mutation { runTest(id: "${testId}") }`;
 const updateTestMutation = `mutation { updateTest(test: {
-  id: "${testId}",
-  name: "My test name",
+  id: "${testId}"
+  name: "My test name"
   request: {
-    method: POST,
-    url: "https://www.rockywarren.com",
+    method: POST
+    url: "https://www.rockywarren.com"
     body: "{}"
-  },
+  }
   assertions: [{
-    target: STATUS_CODE,
+    target: STATUS_CODE
     comparison: EQUAL
     value: "200"
+  }]
+  variables: [{
+    key: "MyVariable"
+    value: "Location"
   }]
 }) { id } }`;
 const deleteTestMutation = `mutation { deleteTest(id: "${testId}") { id } }`;
