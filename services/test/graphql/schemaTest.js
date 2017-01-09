@@ -48,10 +48,6 @@ const testsSnippet = `
     comparison
     value
   }
-  variables {
-    key
-    value
-  }
   lastFailure {
     ${runsSnippet}
   }
@@ -73,15 +69,11 @@ const createTestMutation = `mutation { createTest(test: {
     }]
     method: GET
     url: "https://www.rockywarren.com"
-  },
+  }
   assertions: [{
     target: ELAPSED_TIME_MS
     comparison: LESS_THAN
     value: "1200"
-  }],
-  variables: [{
-    key: "MyVariable"
-    value: "Location"
   }]
 }) { id } }`;
 const runTestMutation = `mutation { runTest(id: "${testId}") }`;
@@ -97,10 +89,6 @@ const updateTestMutation = `mutation { updateTest(test: {
     target: STATUS_CODE
     comparison: EQUAL
     value: "200"
-  }]
-  variables: [{
-    key: "MyVariable"
-    value: "Location"
   }]
 }) { id } }`;
 const deleteTestMutation = `mutation { deleteTest(id: "${testId}") { id } }`;

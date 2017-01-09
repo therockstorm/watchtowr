@@ -141,6 +141,47 @@ const mutations = [
   //     value: "200"
   //   }]
   // }) { id }}`,
+  //   `mutation { createTest(test: {
+  //   name: "POST /customers/{id}/funding-sources"
+  //   request: {
+  //     method: POST
+  //     url: "{{CreatedCustomerUrl}}/funding-sources"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }, {
+  //       key: "Content-Type", value: "{{Content-Type}}"
+  //     }]
+  //     body: ${JSON.stringify("{\"routingNumber\": \"222222226\", \"accountNumber\": \"{{randomInt}}}\", \"type\": \"Checking\"}")}
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "201"
+  //   }]
+  //   variables: [{
+  //     key: "location"
+  //     value: "CreatedFundingSourceUrl"
+  //   }]
+  // }) { id }}`,
+  // `mutation { createTest(test: {
+  //   name: "GET /funding-sources/{id}"
+  //   request: {
+  //     method: GET
+  //     url: "{{CreatedFundingSourceUrl}}"
+  //     headers: [{
+  //      key: "Accept", value: "{{Accept}}"
+  //     }, {
+  //       key: "Authorization", value: "{{Authorization}}"
+  //     }]
+  //   }
+  //   assertions: [{
+  //     target: STATUS_CODE
+  //     comparison: EQUAL
+  //     value: "200"
+  //   }]
+  // }) { id }}`,
   // `mutation { updateTest(test: {
   //   id: "11e6ca3d-3c26-0800-92ce-8b6ea89e1912"
   //   name: "Transfer"
@@ -182,8 +223,6 @@ const mutations = [
   //   runTest(id: "11e6d60b-41cc-2120-9bf0-0584478cfc08")
   // }`,
 ];
-
-// console.log(JSON.stringify(mutations[0]));
 
 mutations.map(query => handle({ body: `{ "query": ${JSON.stringify(query)} }` }, { awsRequestId: 1 }, ((err, res) => {
   if (err) console.log(`err=${JSON.stringify(err)}`);

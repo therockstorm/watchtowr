@@ -29,4 +29,8 @@ export default class Util {
   static randomString() {
     return crypto.randomBytes(5).toString('hex');
   }
+
+  static randomInt() {
+    return Math.floor(Math.random() * 90000) + 10000;
+  }
 }

@@ -14,8 +14,6 @@ export default class TestRunner {
     this.writer = writer;
     this.runBuilder = runBuilder;
     this.notifier = notifier;
-    this.localVars = {};
-    this.globalVars = { '{{randomString}}': Util.randomString() };
   }
 
   runAll() {
@@ -38,7 +36,7 @@ export default class TestRunner {
       const started = new Date().getTime();
       const startedHighRes = process.hrtime();
       return axios.request({
-        url: Util.replaceAll(test.request.url, Object.assign({}, variables, this.localVars)),
+        url: Util.replaceAll(test.request.url, variables),
         method: astFromValue(test.request.method, httpMethodEnum).value,
         headers: TestRunner._mapHeaders(test.request.headers, variables),
         data: test.request.body ? Util.replaceAll(
@@ -47,11 +45,6 @@ export default class TestRunner {
         validateStatus: status => status >= 100 && status < 600,
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
-        if (test.variables) {
-          test.variables.forEach((v) => {
-            if (v.key in res.headers) this.localVars[`{{${v.value}}}`] = res.headers[v.key];
-          });
-        }
         this.writer.createRun(test.id, this.runBuilder.build()).then((run) => {
           const valid = run && run.results && run.results.every(result => result.success);
           if (!valid) this.notifier.notify(test, run);
@@ -67,7 +60,10 @@ export default class TestRunner {
 
   _getVariables() {
     return Promise.resolve(this.reader.getVariables().then((vars) => {
-      const variables = {};
+      const variables = {
+        '{{randomString}}': Util.randomString(),
+        '{{randomInt}}': Util.randomInt(),
+      };
       vars.map(v => (variables[v.key] = v.value));
       return variables;
     }));

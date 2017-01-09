@@ -3,7 +3,6 @@ import GraphiQL from 'graphiql';
 import fetch from 'isomorphic-fetch';
 import { buildClientSchema, introspectionQuery } from 'graphql/utilities';
 import 'graphiql/graphiql.css';
-import Footer from './Footer';
 import Form from './Form';
 import logo from '../../icons/watchtowr.png';
 
@@ -93,9 +92,6 @@ query {
               />
             </Form>
           </GraphiQL.Toolbar>
-          <GraphiQL.Footer>
-            <Footer />
-          </GraphiQL.Footer>
         </GraphiQL>
       </div>
     );
