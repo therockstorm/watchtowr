@@ -1,4 +1,4 @@
-import React, { Component, PropTypes } from 'react';
+import React, { Component } from 'react';
 import GraphiQL from 'graphiql';
 import fetch from 'isomorphic-fetch';
 import { buildClientSchema, introspectionQuery } from 'graphql/utilities';
@@ -7,14 +7,46 @@ import Form from './Form';
 import logo from '../../icons/watchtowr.png';
 
 const styles = { height: '100vh' };
+const search = window.location.search;
+const parameters = {};
+search.substr(1).split('&').forEach((entry) => {
+  const eq = entry.indexOf('=');
+  if (eq >= 0) {
+    parameters[decodeURIComponent(entry.slice(0, eq))] = decodeURIComponent(entry.slice(eq + 1));
+  }
+});
+
+if (parameters.variables) {
+  try {
+    parameters.variables = JSON.stringify(JSON.parse(parameters.variables), null, 2);
+  } catch (e) { // es-lint-ignore-this-line no-empty
+  }
+}
 
 export default class CustomGraphiQL extends Component {
+  static updateURL() {
+    const newSearch = `?${Object.keys(parameters)
+      .filter(key => (Boolean(parameters[key])))
+      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`).join('&')}`;
+    history.replaceState(null, null, `${newSearch}/#/graphiql`);
+  }
+
+  static onEditQuery(newQuery) {
+    parameters.query = newQuery;
+    CustomGraphiQL.updateURL();
+  }
+
+  static onEditVariables(newVariables) {
+    parameters.variables = newVariables;
+    CustomGraphiQL.updateURL();
+  }
+
   constructor(props) {
     super(props);
     this.state = {
       fetcher: this.fetcher.bind(this),
-      query: props.parameters.query,
-      variables: props.parameters.variables,
+      query: parameters.query,
+      variables: parameters.variables,
       defaultQuery: `# Write GraphQL queries aware of the current schema with this in-browser
 # IDE. Access auto-complete with Ctrl-Space and press the run button
 # above or Cmd-Enter to execute queries. Access "Docs" on the far right.
@@ -27,21 +59,11 @@ query {
   }
 }
 `,
-      onEditQuery: this.onEditQuery.bind(this),
-      onEditVariables: this.onEditVariables.bind(this),
+      onEditQuery: CustomGraphiQL.onEditQuery.bind(this),
+      onEditVariables: CustomGraphiQL.onEditVariables.bind(this),
       apiKey: '',
     };
     this.onApiKeyChange = this._onApiKeyChange.bind(this);
-  }
-
-  onEditQuery(newQuery) {
-    this.props.parameters.query = newQuery;
-    this.updateURL();
-  }
-
-  onEditVariables(newVariables) {
-    this.props.parameters.variables = newVariables;
-    this.updateURL();
   }
 
   updateSchema() {
@@ -68,13 +90,6 @@ query {
     }).then(res => res.json()).catch(err => (err instanceof TypeError ? "Error: Make sure you've added your 'X-API-Key' header above." : err));
   }
 
-  updateURL() {
-    const newSearch = `?${Object.keys(this.props.parameters)
-      .filter(key => (Boolean(this.props.parameters[key])))
-      .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(this.props.parameters[key])}`).join('&')}`;
-    history.replaceState(null, null, newSearch);
-  }
-
   render() {
     return (
       <div style={styles}>
@@ -97,5 +112,3 @@ query {
     );
   }
 }
-
-CustomGraphiQL.propTypes = { parameters: PropTypes.object };

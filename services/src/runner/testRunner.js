@@ -32,7 +32,7 @@ export default class TestRunner {
   }
 
   _run(test, variables) {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const started = new Date().getTime();
       const startedHighRes = process.hrtime();
       return axios.request({
@@ -43,17 +43,16 @@ export default class TestRunner {
           test.request.body, Object.assign({}, this.globalVars, variables)) : test.request.body,
         timeout: 90000,
         validateStatus: status => status >= 100 && status < 600,
+      }).then(res => res).catch((err) => {
+        Util.error(err);
+        return { status: 0 };
       }).then((res) => {
         this.runBuilder.create(started, startedHighRes, test.assertions, res);
         this.writer.createRun(test.id, this.runBuilder.build()).then((run) => {
           const valid = run && run.results && run.results.every(result => result.success);
           if (!valid) this.notifier.notify(test, run);
-          resolve(run);
+          resolve();
         });
-      }).catch((err) => {
-        // createRun failure
-        Util.error(err);
-        return reject(err);
       });
     });
   }
