@@ -28,7 +28,7 @@ export default class CustomGraphiQL extends Component {
     const newSearch = `?${Object.keys(parameters)
       .filter(key => (Boolean(parameters[key])))
       .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(parameters[key])}`).join('&')}`;
-    history.replaceState(null, null, `${newSearch}/#/graphiql`);
+    history.replaceState(null, null, `${newSearch}`);
   }
 
   static onEditQuery(newQuery) {

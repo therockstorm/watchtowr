@@ -1,5 +1,15 @@
-.globalContent {
-	flex-grow: 1;
+body {
+  height: 100%;
+  /*background-color: #90CAF9;*/
+  /*background-image: linear-gradient(138deg, #1E88E5 0, #90CAF9 100%);*/
+  /*background-repeat: repeat,no-repeat;*/
+  /*background-attachment: fixed;*/
+  color: #343d4a;
+}
+
+.center {
+  text-align: center;
+  margin: auto;
 }
 
 main {
@@ -29,7 +39,7 @@ main header .stripes {
 	width: 100%;
 	height: 100%;
 	bottom: 280px;
-	transform: skewY(-6deg);
+	transform: skewY(-10deg);
 	z-index: -1;
 }
 
