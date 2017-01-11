@@ -1,16 +1,12 @@
 import React from 'react';
 import './Form.css';
 
-const Form = ({ children }) => (
-  <div className="form">
-    <form>
-      {{ ...children }}
-    </form>
-  </div>
-);
+const Form = ({ children }) => <div className="form">
+  <form>
+    {{ ...children }}
+  </form>
+</div>;
 
-Form.propTypes = {
-  children: React.PropTypes.object.isRequired,
-};
+Form.propTypes = { children: React.PropTypes.object.isRequired };
 
 export default Form;
