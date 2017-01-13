@@ -7,12 +7,7 @@
     "all:install": "./all.sh yarn",
     "all:lint": "./all.sh 'yarn run lint'",
     "all:outdated": "yarn outdated && ./all.sh 'yarn outdated'",
-    "all:test": "./all.sh 'yarn run test'",
-    "cert:deploy": "",
-    "cert:deploy:console": "",
-    "cert:deploy:services": "",
-    "cert:issue": "",
-    "cert:renew": ""
+    "all:test": "./all.sh 'yarn run test'"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
