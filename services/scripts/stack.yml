@@ -4,7 +4,7 @@ EmailSnsTopic:
     DisplayName: watchtowr-servicesEmail
     Subscription:
       - Protocol: email
-        Endpoint: rocky.warren+watchtowr-services-alarm@gmail.com
+        Endpoint: test+watchtowr-services-alarm@gmail.com
 TestsTable:
   Type: 'AWS::DynamoDB::Table'
   DeletionPolicy: Retain

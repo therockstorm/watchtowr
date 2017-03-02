@@ -11,7 +11,7 @@ const snsTopic = () => ({
   Type: 'AWS::SNS::Topic',
   Properties: {
     DisplayName: `${service}Email`,
-    Subscription: [{ Protocol: 'email', Endpoint: `rocky.warren+${service}-alarm@gmail.com` }],
+    Subscription: [{ Protocol: 'email', Endpoint: `${process.env.EMAIL}+${service}-alarm@gmail.com` }],
   },
 });
 

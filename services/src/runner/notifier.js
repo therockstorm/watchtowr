@@ -139,7 +139,7 @@ export default class Notifier {
     this.ses.sendEmail({
       Destination: {
         ToAddresses: [
-          'rocky.warren@gmail.com',
+          process.env.EMAIL,
         ],
       },
       Message: {
