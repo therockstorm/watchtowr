@@ -29,8 +29,10 @@ iam.uploadServerCertificate({
     configCopy.DistributionConfig.ViewerCertificate.IAMCertificateId = certId;
     configCopy.DistributionConfig.ViewerCertificate.Certificate = certId;
     configCopy.DistributionConfig.ViewerCertificate.CertificateSource = 'iam';
-    configCopy.DistributionConfig.IsIPV6Enabled = true;
     configCopy.DistributionConfig.ViewerCertificate.CloudFrontDefaultCertificate = false;
+    configCopy.DistributionConfig.DefaultCacheBehavior.ViewerProtocolPolicy = 'redirect-to-https';
+    configCopy.DistributionConfig.HttpVersion = 'http2';
+    configCopy.DistributionConfig.IsIPV6Enabled = true;
     if (!('SSLSupportMethod' in configCopy.DistributionConfig.ViewerCertificate)) {
       configCopy.DistributionConfig.ViewerCertificate.SSLSupportMethod = 'sni-only';
       configCopy.DistributionConfig.ViewerCertificate.MinimumProtocolVersion = 'TLSv1';
@@ -62,3 +64,4 @@ iam.uploadServerCertificate({
     }).catch(updateErr => console.error(`updateErr=${updateErr}`));
   }).catch(configErr => console.error(`configErr=${configErr}`));
 }).catch(uploadErr => console.error(`uploadErr=${uploadErr}`));
+

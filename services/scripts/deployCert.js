@@ -13,7 +13,7 @@ const apigateway = new aws.APIGateway({ region });
 const apiDomain = `api.${domain}`;
 
 apigateway.getDomainName({ domainName: apiDomain }, (getErr) => {
-  if (!getErr) console.error('Implment deleteDomainName or manually go to API Gateway console -> Custom Domain Names and upload a Backup Certificate');
+  if (!getErr) console.error('Manually go to API Gateway console -> Custom Domain Names and upload a Backup Certificate. https://docs.aws.amazon.com/apigateway/latest/developerguide/how-to-custom-domains.html#how-to-rotate-custom-domain-certificate');
   else if (getErr.code !== 'NotFoundException') console.error(`Unexpected getErr=${getErr}`);
   else {
     const utf8 = 'utf8';
