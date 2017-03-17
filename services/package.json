@@ -18,7 +18,7 @@
     "build:stack": "babel-node scripts/generateStack.js ${npm_package_name} ${npm_package_config_apiId}",
     "build:services": "mkdir dist && cp src/serverless.yml dist && cp src/package.json dist && cd dist && yarn && snyk test && snyk monitor && cd .. && babel --out-dir=dist ./src",
     "cert:deploy": "babel-node scripts/deployCert.js ${npm_package_config_provider} ${npm_package_config_domain} ${npm_package_config_region} ${npm_package_config_apiId}",
-    "cert:info": "babel-node scripts/getInfo.js ${npm_package_config_provider} ${npm_package_config_domain}",
+    "cert:info": "node ../../aws-scripts/getInfo.js ${npm_package_config_provider} ${npm_package_config_domain}",
     "cert:issue": "$ACME_DIR/acme.sh --issue --dns --domain ${npm_package_config_domain} --domain www.${npm_package_config_domain} --domain api.${npm_package_config_domain}",
     "cert:renew": "$ACME_DIR/acme.sh --renew --domain ${npm_package_config_domain} --domain www.${npm_package_config_domain} --domain api.${npm_package_config_domain}",
     "clean": "rm -rf dist",
